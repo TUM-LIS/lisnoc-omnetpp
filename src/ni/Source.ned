@@ -22,7 +22,9 @@ simple Source
 {
     parameters:
         volatile double sendInterval @unit(s) = default(exponential(1s));
+        int nVCs = default(1);
         @display("i=block/source");
     gates:
-        output out;
+        output out[nVCs];
+        input fc_in[nVCs];
 }
