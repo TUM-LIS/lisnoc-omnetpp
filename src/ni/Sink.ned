@@ -22,9 +22,11 @@ simple Sink
 {
     parameters:
         int nVCs = default(1);
+		int id;
 
         @display("i=block/sink");
     gates:
         input in[nVCs];
-        output fc_out[nVCs];
+        input fc_req_in[nVCs];
+        output fc_grant_out[nVCs];
 }

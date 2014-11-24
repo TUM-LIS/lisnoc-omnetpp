@@ -21,28 +21,40 @@ package lisnoc.ni;
 module NetworkInterface
 {
     parameters:
+        int id;
         int nVCs;
-    
+
     gates:
-        input in[nVCs];
+        // NI output
         output out[nVCs];
-        output fc_out[nVCs];
-        input fc_in[nVCs];
-        
+        output fc_req_out[nVCs];
+        input fc_grant_in[nVCs];
+
+		// NI input
+        input in[nVCs];
+        input fc_req_in[nVCs];
+        output fc_grant_out[nVCs];
+
     submodules:
         sink: Sink {
-            @display("p=43,48");
+            parameters:
+            	id = id;
+            @display("p=43,48");            
         }
         source: Source {
+            parameters:
+                id = id;
             @display("p=109,48");
         }
-        
+
     connections:
-	    for vc=0..(nVCs-1) {
-			source.out[vc] --> out[vc];
-			fc_in[vc] --> source.fc_in[vc];
-			sink.fc_out[vc] --> fc_out[vc];
-			in[vc] --> sink.in[vc];
-   	    }    
-        
+        for vc=0..(nVCs-1) {
+            source.out[vc] --> out[vc];
+            source.fc_req_out[vc] --> fc_req_out[vc];
+            fc_grant_in[vc] --> source.fc_grant_in[vc];
+            in[vc] --> sink.in[vc];
+            fc_req_in[vc] --> sink.fc_req_in[vc];
+            sink.fc_grant_out[vc] --> fc_grant_out[vc];
+        }
+
 }
