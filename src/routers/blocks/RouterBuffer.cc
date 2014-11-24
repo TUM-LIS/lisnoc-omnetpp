@@ -15,18 +15,63 @@
 
 #include "RouterBuffer.h"
 
+#include <cassert>
+
+#define NEXT_CYCLE (simTime() + simtime_t(2,SIMTIME_NS))
+
 namespace lisnoc {
 
 Define_Module(RouterBuffer);
 
 void RouterBuffer::initialize()
 {
-    // TODO - Generated method body
+    // TODO: parameter
+    m_maxfill = 4;
+}
+
+void RouterBuffer::handleIncomingFlit(LISNoCFlit *msg)
+{
+    LISNoCResponse *resp = new LISNoCResponse();
+
+    if (m_buffer.getLength() < m_maxfill) {
+        m_buffer.insert(msg);
+        resp->setAck(true);
+        scheduleAt(NEXT_CYCLE, &m_timerMsg);
+    } else {
+        resp->setAck(false);
+    }
+
+    send(resp,"out_fc");
+}
+
+void RouterBuffer::trySend()
+{
+    assert(m_buffer.getLength() >= 1);
+
+    send(m_buffer.front(),"out");
+}
+
+void RouterBuffer::handleIncomingResponse(LISNoCResponse *msg)
+{
+    assert(m_buffer.getLength() >= 1);
+
+    if (msg->getAck()) {
+        m_buffer.pop();
+    } else {
+        scheduleAt(NEXT_CYCLE, m_timerMsg);
+    }
+
 }
 
 void RouterBuffer::handleMessage(cMessage *msg)
 {
-    // TODO - Generated method body
+    if (msg->isSelfMessage()) {
+        trySend();
+    } else if (msg->getKind() == LISNOC_FLIT) {
+        handleIncomingFlit((LISNoCFlit*) msg);
+    } else if (msg->getKind() == LISNOC_RESPONSE) {
+        handleIncomingResponse((LISNoCResponse*) msg);
+    }
 }
 
 } //namespace

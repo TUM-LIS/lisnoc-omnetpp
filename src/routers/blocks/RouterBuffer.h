@@ -18,6 +18,8 @@
 
 #include <omnetpp.h>
 
+#include <LISNoC_m.h>
+
 namespace lisnoc {
 
 /**
@@ -25,9 +27,16 @@ namespace lisnoc {
  */
 class RouterBuffer : public cSimpleModule
 {
+private:
+    cQueue m_buffer;
+    int m_maxfill;
+    cMessage m_timerMsg;
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
+    virtual void handleIncomingFlit(LISNoCFlit *msg);
+    virtual void handleIncomingResponse(LISNoCResponse *msg);
+    virtual void trySend();
 };
 
 } //namespace
