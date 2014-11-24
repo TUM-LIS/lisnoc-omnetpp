@@ -32,12 +32,14 @@ network MeshBuffered {
 	    	parameters:
 	    	    nPorts = nPorts;
 	    	    nVCs = nVCs;   
+	        @display("p=100,100,m,$columns,100,100");
 	    }
 	    
 	    ni[columns*rows]: NetworkInterface {
 	     	parameters:
 	     	    nVCs = nVCs;
 	     	    id = index;   
+	        @display("p=50,50,m,$columns,100,100");
 	    }
 	    
 	connections allowunconnected:
