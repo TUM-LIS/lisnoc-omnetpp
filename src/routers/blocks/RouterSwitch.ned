@@ -25,6 +25,10 @@ simple RouterSwitch
         input in[nPorts*nVCs];
         output out[nPorts*nVCs];
         
-        input fc_in[nPorts*nVCs];
-        output fc_out[nPorts*nVCs];
+        input fc_req_in[nPorts*nVCs];
+        input fc_grant_in[nPorts*nVCs];
+        
+        output fc_req_out[nPorts*nVCs];
+        output fc_grant_out[nPorts*nVCs];
+        
 }

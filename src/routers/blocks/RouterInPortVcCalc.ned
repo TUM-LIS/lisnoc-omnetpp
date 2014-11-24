@@ -24,6 +24,9 @@ simple RouterInPortVcCalc
         input in;
         output out;
         
-        input fc_in;
-        output fc_out;
+        input fc_req_in;
+        input fc_grant_in;
+        
+        output fc_req_out;
+        output fc_grant_out;
 }

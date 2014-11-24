@@ -24,8 +24,11 @@ module RouterInPort
         input in[nVCs];
         output out[nVCs];
         
-        input fc_in[nVCs];
-        output fc_out[nVCs];
+        input fc_req_in[nVCs];
+        input fc_grant_in[nVCs];
+        
+        output fc_req_out[nVCs];
+        output fc_grant_out[nVSs];
         
    	submodules:
    	    buffer[nVCs]: RouterBuffer;
@@ -39,9 +42,14 @@ module RouterInPort
    	     	opCalc[i].out --> vcCalc[i].in;
    	     	vcCalc[i].out --> out[i];
    	     	
-   	     	fc_in[i] --> vcCalc[i].fc_in;
-   	     	vcCalc[i].fc_out --> opCalc[i].fc_in;
-   	     	opCalc[i].fc_out --> buffer[i].fc_in;
-   	     	buffer[i].fc_out --> fc_out[i];
+   	     	fc_req_in[i] --> buffer[i].fc_req_in;
+   	     	buffer[i].fc_req_out --> opCalc[i].fc_req_in;
+   	     	opCalc[i].fc_req_out --> vcCalc[i].fc_req_in;
+   	     	vcCalc[i].fc_req_out --> fc_req_out[i];
+   	     	
+   	     	fc_grant_in[i] --> vcCalc[i].fc_grant_in;
+   	     	vcCalc[i].fc_grant_out --> opCalc[i].fc_grant_in;
+   	     	opCalc[i].fc_grant_out --> buffer[i].fc_grant_in;
+   	     	buffer[i].fc_grant_out --> fc_grant_out[i];
    	     }   	     
 }

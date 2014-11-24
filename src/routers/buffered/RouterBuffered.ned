@@ -29,8 +29,11 @@ module RouterBuffered
         input in[nPorts*nVCs];
         output out[nPorts*nVCs];
         
-        input fc_in[nPorts*nVCs];
-        output fc_out[nPorts*nVCs];
+        input fc_req_in[nPorts*nVCs];
+        input fc_grant_in[nPorts*nVCs];
+        
+        output fc_req_out[nPorts*nVCs];
+        output fc_grant_out[nPorts*nVCs];
         
    	submodules:
    		inPort[nPorts]: RouterInPort {
@@ -54,10 +57,14 @@ module RouterBuffered
 			switch.out[p*nVCs+vc] --> outPort[p].in[vc];
 			outPort[p].out[vc] --> out[p*nVCs+vc];
 			
-			fc_in[p*nVCs+vc] --> outPort[p].fc_in[vc];
-			inPort[p].fc_out[vc] --> fc_out[p*nVCs+vc];
+			fc_req_in[p*nVCs+vc] --> inPort[p].fc_req_in[vc];
+			inPort[p].fc_req_out[vc] --> switch.fc_req_in[p*nVCs+vc];
+			switch.fc_req_out[p*nVCs+vc] --> outPort[p].fc_req_in[vc];
+			outPort[p].fc_req_out[vc] --> fc_req_out[p*nVCs+vc];
 			
-			switch.fc_out[p*nVCs+vc] --> inPort[p].fc_in[vc];
-			outPort[p].fc_out[vc] --> switch.fc_in[p*nVCs+vc];				
+			fc_grant_in[p*nVCs+vc] --> outPort[p].fc_grant_in[vc];
+			outPort[p].fc_grant_out[vc] --> switch.fc_grant_in[p*nVCs+vc];
+			switch.fc_grant_out[p*nVCs+vc] --> inPort[p].fc_grant_in[vc];
+			inPort[p].fc_grant_out[vc] --> fc_grant_out[p*nVCs+vc];			
    	    }    
 }
