@@ -13,16 +13,23 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package lisnoc;
+#ifndef __LISNOC_BUFFER_H_
+#define __LISNOC_BUFFER_H_
 
-//
-// Generates messages with a configurable interarrival time.
-//
-simple Source
+#include <omnetpp.h>
+
+namespace lisnoc {
+
+/**
+ * TODO - Generated class
+ */
+class Buffer : public cSimpleModule
 {
-    parameters:
-        volatile double sendInterval @unit(s) = default(exponential(1s));
-        @display("i=block/source");
-    gates:
-        output out;
-}
+  protected:
+    virtual void initialize();
+    virtual void handleMessage(cMessage *msg);
+};
+
+} //namespace
+
+#endif

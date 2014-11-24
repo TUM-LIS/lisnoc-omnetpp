@@ -13,19 +13,15 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package lisnoc.simulations;
-
-import lisnoc.ni.Source;
-import lisnoc.ni.Sink;
+package lisnoc.ni;
 
 //
-// Sample network, consisting of a source and a sink.
+// Consumes received messages and collects statistics
 //
-network SourceSink
+simple Sink
 {
-    submodules:
-        source: Source;
-        sink: Sink;
-    connections:
-        source.out --> sink.in;
+    parameters:
+        @display("i=block/sink");
+    gates:
+        input in;
 }

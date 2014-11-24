@@ -13,19 +13,11 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package lisnoc.simulations;
-
-import lisnoc.ni.Source;
-import lisnoc.ni.Sink;
+package lisnoc.routers.buffered;
 
 //
-// Sample network, consisting of a source and a sink.
+// TODO auto-generated module
 //
-network SourceSink
+simple RouterBuffered
 {
-    submodules:
-        source: Source;
-        sink: Sink;
-    connections:
-        source.out --> sink.in;
 }

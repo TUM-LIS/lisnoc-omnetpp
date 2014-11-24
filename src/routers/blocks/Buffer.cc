@@ -13,15 +13,20 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package lisnoc;
+#include "Buffer.h"
 
-//
-// Consumes received messages and collects statistics
-//
-simple Sink
+namespace lisnoc {
+
+Define_Module(Buffer);
+
+void Buffer::initialize()
 {
-    parameters:
-        @display("i=block/sink");
-    gates:
-        input in;
+    // TODO - Generated method body
 }
+
+void Buffer::handleMessage(cMessage *msg)
+{
+    // TODO - Generated method body
+}
+
+} //namespace

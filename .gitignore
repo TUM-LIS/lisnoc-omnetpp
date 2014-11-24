@@ -3,3 +3,4 @@ src/Makefile
 
 # Output files
 out/
+src/lisnoc

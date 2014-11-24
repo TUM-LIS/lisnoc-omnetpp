@@ -13,19 +13,23 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package lisnoc.simulations;
+#ifndef __LISNOC_LOOKUPDIMENSIONXY_H_
+#define __LISNOC_LOOKUPDIMENSIONXY_H_
 
-import lisnoc.ni.Source;
-import lisnoc.ni.Sink;
+#include <omnetpp.h>
 
-//
-// Sample network, consisting of a source and a sink.
-//
-network SourceSink
+namespace lisnoc {
+
+/**
+ * TODO - Generated class
+ */
+class LookupDimensionXY : public cSimpleModule
 {
-    submodules:
-        source: Source;
-        sink: Sink;
-    connections:
-        source.out --> sink.in;
-}
+  protected:
+    virtual void initialize();
+    virtual void handleMessage(cMessage *msg);
+};
+
+} //namespace
+
+#endif

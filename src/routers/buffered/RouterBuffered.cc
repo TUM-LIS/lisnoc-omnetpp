@@ -13,19 +13,20 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package lisnoc.simulations;
+#include "RouterBuffered.h"
 
-import lisnoc.ni.Source;
-import lisnoc.ni.Sink;
+namespace lisnoc {
 
-//
-// Sample network, consisting of a source and a sink.
-//
-network SourceSink
+Define_Module(RouterBuffered);
+
+void RouterBuffered::initialize()
 {
-    submodules:
-        source: Source;
-        sink: Sink;
-    connections:
-        source.out --> sink.in;
+    // TODO - Generated method body
 }
+
+void RouterBuffered::handleMessage(cMessage *msg)
+{
+    // TODO - Generated method body
+}
+
+} //namespace

@@ -13,19 +13,16 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package lisnoc.simulations;
-
-import lisnoc.ni.Source;
-import lisnoc.ni.Sink;
+package lisnoc.ni;
 
 //
-// Sample network, consisting of a source and a sink.
+// Generates messages with a configurable interarrival time.
 //
-network SourceSink
+simple Source
 {
-    submodules:
-        source: Source;
-        sink: Sink;
-    connections:
-        source.out --> sink.in;
+    parameters:
+        volatile double sendInterval @unit(s) = default(exponential(1s));
+        @display("i=block/source");
+    gates:
+        output out;
 }
