@@ -14,6 +14,7 @@
 // 
 
 #include "RouterInPortVcCalc.h"
+#include <LISNoC_m.h>
 
 namespace lisnoc {
 
@@ -21,12 +22,16 @@ Define_Module(RouterInPortVcCalc);
 
 void RouterInPortVcCalc::initialize()
 {
-    // TODO - Generated method body
+
 }
 
 void RouterInPortVcCalc::handleMessage(cMessage *msg)
 {
-    // TODO - Generated method body
+    if (msg->getKind() == LISNOC_FLIT) {
+        send(msg, "out");
+    } else if (msg->getKind() == LISNOC_RESPONSE) {
+        send(msg, "fc_out");
+    }
 }
 
 } //namespace
