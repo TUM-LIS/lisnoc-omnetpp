@@ -16,17 +16,18 @@
 namespace lisnoc;
 
 enum LISNoC_Message {
-	NOC_FLIT = 0;
-	NOC_CREDIT = 1;
-	NOC_REQ = 2;
-	NOC_GNT = 3;  
+	LISNOC_FLIT = 0;
+	LISNOC_RESPONSE = 1;
 }
 
-packet LISNoC {
-	int type @enum(LISNoC_Message);
-	int packetId;
+packet LISNoCFlit {
+    int packetId;
 	int srcId;
   	int dstId;
   	int VC;
   	uint8_t data[];
+}
+
+packet LISNoCResponse {
+	bool ack;
 }
