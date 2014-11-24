@@ -19,13 +19,14 @@
 #include <omnetpp.h>
 
 #include <LISNoC_m.h>
+#include <LISNoCBaseModule.h>
 
 namespace lisnoc {
 
 /**
  * Generates messages; see NED file for more info.
  */
-class Source : public cSimpleModule
+class Source : public LISNoCBaseModule
 {
   private:
     int m_id;
@@ -36,10 +37,12 @@ class Source : public cSimpleModule
 
   protected:
     virtual void initialize();
-    virtual void handleMessage(cMessage *msg);
-    virtual void handleMessageGrant(LISNoCFlowControlMsg *msg);
     virtual void genPacket();
-    virtual void trySend();
+    virtual void handleSelfMessage(cMessage *msg);
+    virtual void doTransfer();
+    virtual bool isRequestGranted(LISNoCFlowControlMsg *msg) { return false; }
+    virtual void handleIncomingFlit(LISNoCFlit *msg) { }
+
 };
 
 }; // namespace

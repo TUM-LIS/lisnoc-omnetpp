@@ -21,14 +21,11 @@ namespace lisnoc {
 
 Define_Module(Source);
 
-#define DELAY (simTime() + simtime_t(200,SIMTIME_NS))
-#define NEXT_CYCLE (simTime() + simtime_t(2,SIMTIME_NS))
-
 void Source::initialize()
 {
     m_id = par("id");
     if (m_id == 0) {
-        scheduleAt(simTime(), &m_timerMessage);
+        triggerSelf(0, &m_timerMessage);
     }
 }
 
@@ -42,47 +39,26 @@ void Source::genPacket()
         m_queue.insert(flit);
     }
 
-    if (!m_trySendMessage.isScheduled()) {
-        scheduleAt(simTime(), &m_trySendMessage);
-    }
+    requestTransfer();
 }
 
-void Source::trySend()
+void Source::doTransfer()
 {
     ASSERT(m_queue.getLength() > 0);
-
-    m_flowControlMessage.setKind(LISNOC_REQUEST);
-    send(&m_flowControlMessage, "fc_req_out", 0);
-}
-
-void Source::handleMessageGrant(LISNoCFlowControlMsg *msg)
-{
-    ASSERT(m_queue.getLength() > 0);
-
-    if (!msg->getAck()) {
-        return;
-    }
 
     sendDelayed((cMessage*)m_queue.pop(), SIMTIME_ZERO, "out", 0);
 
-    if (m_queue.getLength() > 0 && !m_trySendMessage.isScheduled()) {
-        scheduleAt(simTime() + simtime_t(2,SIMTIME_NS), &m_trySendMessage);
+    if (m_queue.getLength() > 0) {
+        requestTransferAfter(1);
     }
 
 }
 
-void Source::handleMessage(cMessage *msg)
-{
-    if (msg->isSelfMessage()) {
-        if (msg == &m_timerMessage) {
-            genPacket();
-            //scheduleAt(DELAY, &m_timerMessage);
-        } else if (msg == &m_trySendMessage) {
-            trySend();
-        }
-    } else if (msg->getKind() == LISNOC_GRANT){
-        handleMessageGrant((LISNoCFlowControlMsg*) msg);
-    }
+void Source::handleSelfMessage(cMessage *msg) {
+    ASSERT(msg == &m_timerMessage);
+
+    genPacket();
+//    triggerSelf(100, &m_timerMessage);
 }
 
 }; // namespace

@@ -18,8 +18,6 @@
 
 #include <cassert>
 
-#define NEXT_CYCLE (simTime() + simtime_t(2,SIMTIME_NS))
-
 namespace lisnoc {
 
 Define_Module(RouterInPortOpCalc);
@@ -32,17 +30,9 @@ void RouterInPortOpCalc::initialize()
     m_routingFunction = new RoutingFunctionMeshXY(2, getIndex());
 }
 
-void RouterInPortOpCalc::handleMessage(cMessage *msg)
+bool RouterInPortOpCalc::isRequestGranted(LISNoCFlowControlMsg *msg)
 {
-    if (msg->isSelfMessage()) {
-        trySend();
-    } else if (msg->getKind() == LISNOC_FLIT) {
-        handleIncomingFlit((LISNoCFlit*) msg);
-    } else if (msg->getKind() == LISNOC_REQUEST) {
-        handleIncomingRequest((LISNoCFlowControlMsg*) msg);
-    } else if (msg->getKind() == LISNOC_GRANT) {
-        handleIncomingGrant((LISNoCFlowControlMsg*) msg);
-    }
+    return (m_storedFlit == NULL);
 }
 
 void RouterInPortOpCalc::handleIncomingFlit(LISNoCFlit *msg)
@@ -56,30 +46,24 @@ void RouterInPortOpCalc::handleIncomingFlit(LISNoCFlit *msg)
 
 }
 
-void RouterInPortOpCalc::handleIncomingGrant(LISNoCFlowControlMsg *msg)
+void RouterInPortOpCalc::handleSelfMessage(cMessage *msg)
 {
-    ASSERT(m_storedFlit != NULL);
-
-    if (!msg->getAck()) {
-        return;
-    }
-
-    send(m_storedFlit, "out");
-    m_storedFlit = NULL;
-}
-
-void RouterInPortOpCalc::handleIncomingRequest(LISNoCFlowControlMsg *msg)
-{
-    msg->setKind(LISNOC_GRANT);
-    msg->setAck(m_storedFlit == NULL);
-    sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out");
+    trySend();
 }
 
 void RouterInPortOpCalc::trySend() {
     ASSERT(m_storedFlit != NULL);
 
-    m_flowControlMessage.setKind(LISNOC_REQUEST);
-    sendDelayed(&m_flowControlMessage, SIMTIME_ZERO, "fc_req_out");
+    requestTransfer();
 }
+
+void RouterInPortOpCalc::doTransfer()
+{
+    ASSERT(m_storedFlit != NULL);
+
+    send(m_storedFlit, "out");
+    m_storedFlit = NULL;
+}
+
 
 } //namespace

@@ -36,10 +36,11 @@ protected:
     virtual void handleIncomingGrant(LISNoCFlowControlMsg *msg);
     virtual void handleIncomingFlit(LISNoCFlit *msg) = 0;
 
-    virtual void requestTransfer();
-    virtual void triggerSelf(unsigned int numcycles = 1);
-
+    virtual void triggerSelf(unsigned int numcycles = 1, cMessage *msg = NULL);
     virtual void handleSelfMessage(cMessage *msg) = 0;
+
+    virtual void requestTransfer();
+    virtual void requestTransferAfter(unsigned int numcycles = 0);
     virtual void doTransfer() = 0;
 
     virtual bool isRequestGranted(LISNoCFlowControlMsg *msg) = 0;

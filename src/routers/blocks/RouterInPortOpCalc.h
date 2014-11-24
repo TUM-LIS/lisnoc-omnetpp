@@ -19,12 +19,13 @@
 #include <omnetpp.h>
 
 #include <LISNoC_m.h>
+#include <LISNoCBaseModule.h>
 
 namespace lisnoc {
 
 class RoutingFunctionBase;
 
-class RouterInPortOpCalc : public cSimpleModule
+class RouterInPortOpCalc : public LISNoCBaseModule
 {
 private:
     LISNoCFlit *m_storedFlit;
@@ -32,15 +33,13 @@ private:
 
     RoutingFunctionBase *m_routingFunction;
 
-    LISNoCFlowControlMsg m_flowControlMessage;
-
   protected:
     virtual void initialize();
-    virtual void handleMessage(cMessage *msg);
+    virtual void handleSelfMessage(cMessage *msg);
     virtual void handleIncomingFlit(LISNoCFlit *msg);
-    virtual void handleIncomingRequest(LISNoCFlowControlMsg *msg);
-    virtual void handleIncomingGrant(LISNoCFlowControlMsg *msg);
     virtual void trySend();
+    virtual void doTransfer();
+    virtual bool isRequestGranted(LISNoCFlowControlMsg *msg);
 };
 
 } //namespace

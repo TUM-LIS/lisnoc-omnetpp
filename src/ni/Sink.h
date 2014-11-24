@@ -19,20 +19,22 @@
 #include <omnetpp.h>
 
 #include <LISNoC_m.h>
+#include <LISNoCBaseModule.h>
 
 namespace lisnoc {
 
 /**
  * Message sink; see NED file for more info.
  */
-class Sink : public cSimpleModule
+class Sink : public LISNoCBaseModule
 {
   protected:
     virtual void initialize();
-    virtual void handleMessage(cMessage *msg);
-    virtual void handleMessageFlit(LISNoCFlit *msg);
-    virtual void handleMessageRequest(LISNoCFlowControlMsg *msg);
-    virtual void finish();
+    virtual void handleIncomingFlit(LISNoCFlit *msg);
+    virtual void handleSelfMessage(cMessage *msg) {};
+    virtual void doTransfer() {};
+
+    virtual bool isRequestGranted(LISNoCFlowControlMsg *msg);
 };
 
 }; // namespace

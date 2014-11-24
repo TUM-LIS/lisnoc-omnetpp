@@ -24,29 +24,14 @@ void Sink::initialize()
 
 }
 
-void Sink::handleMessageFlit(LISNoCFlit *msg)
+void Sink::handleIncomingFlit(LISNoCFlit *msg)
 {
     std::cout << "[" << simTime() << "," << getFullPath() << "] Received flit" << std::endl;
 }
 
-void Sink::handleMessageRequest(LISNoCFlowControlMsg *msg)
+bool Sink::isRequestGranted(LISNoCFlowControlMsg *msg)
 {
-   msg->setKind(LISNOC_GRANT);
-   sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out");
-}
-
-void Sink::handleMessage(cMessage *msg)
-{
-    if (msg->getKind() == LISNOC_REQUEST) {
-        handleMessageRequest((LISNoCFlowControlMsg*) msg);
-    } else if (msg->getKind() == LISNOC_FLIT) {
-        handleMessageFlit((LISNoCFlit*) msg);
-    }
-}
-
-void Sink::finish()
-{
-
+   return true;
 }
 
 }; // namespace

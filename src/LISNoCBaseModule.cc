@@ -30,16 +30,25 @@ void LISNoCBaseModule::requestTransfer() {
     m_flowControlMsg.setKind(LISNOC_REQUEST);
     m_flowControlMsg.setAck(false);
 
-    send(&m_flowControlMsg, "fc_req_out");
+    if (hasGate("fc_req_out", 0)) {
+        send(&m_flowControlMsg, "fc_req_out", 0);
+    } else {
+        send(&m_flowControlMsg, "fc_req_out");
+    }
+}
+
+void LISNoCBaseModule::requestTransferAfter(unsigned int numcycles) {
+    ASSERT(m_flowControlMsg.isScheduled() == false);
+    scheduleAt(simTime() + m_clock * numcycles, &m_flowControlMsg);
 }
 
 void LISNoCBaseModule::handleMessage(cMessage *msg)
 {
     if (msg->isSelfMessage()) {
-        if (msg == &m_selfTrigger) {
-            handleSelfMessage(msg);
-        } else if (msg == &m_flowControlMsg) {
+        if (msg == &m_flowControlMsg) {
             requestTransfer();
+        } else {
+            handleSelfMessage(msg);
         }
     } else if (msg->getKind() == LISNOC_FLIT) {
         handleIncomingFlit((LISNoCFlit*) msg);
@@ -50,13 +59,17 @@ void LISNoCBaseModule::handleMessage(cMessage *msg)
     }
 }
 
-void LISNoCBaseModule::triggerSelf(unsigned int numcycles)
+void LISNoCBaseModule::triggerSelf(unsigned int numcycles, cMessage *msg)
 {
+    if (!msg) {
+        msg = &m_selfTrigger;
+    }
+
     simtime_t curtime = simTime();
     ASSERT((curtime.remainderForUnit(SIMTIME_NS) == 0) &&
             (curtime.inUnit(SIMTIME_NS) % 2 == 0));
 
-    scheduleAt(curtime + m_clock * numcycles, &m_selfTrigger);
+    scheduleAt(curtime + m_clock * numcycles, msg);
 }
 
 void LISNoCBaseModule::handleIncomingGrant(LISNoCFlowControlMsg *msg)
@@ -72,7 +85,12 @@ void LISNoCBaseModule::handleIncomingRequest(LISNoCFlowControlMsg *msg)
 {
     msg->setKind(LISNOC_GRANT);
     msg->setAck(isRequestGranted(msg));
-    sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out");
+
+    if (hasGate("fc_grant_out", 0)) {
+        sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out", 0);
+    } else {
+        sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out");
+    }
 }
 
 } /* namespace lisnoc */
