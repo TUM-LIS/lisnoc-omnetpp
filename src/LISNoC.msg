@@ -31,4 +31,6 @@ packet LISNoCFlit {
 }
 
 packet LISNoCFlowControlMsg {
+    bool ack; // In Grant
+    bool allowLateAck; // In Request
 }

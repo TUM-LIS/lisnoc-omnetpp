@@ -60,16 +60,19 @@ void RouterInPortOpCalc::handleIncomingGrant(LISNoCFlowControlMsg *msg)
 {
     ASSERT(m_storedFlit != NULL);
 
+    if (!msg->getAck()) {
+        return;
+    }
+
     send(m_storedFlit, "out");
     m_storedFlit = NULL;
 }
 
 void RouterInPortOpCalc::handleIncomingRequest(LISNoCFlowControlMsg *msg)
 {
-    if(m_storedFlit == NULL) {
-        msg->setKind(LISNOC_GRANT);
-        sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out");
-    }
+    msg->setKind(LISNOC_GRANT);
+    msg->setAck(m_storedFlit == NULL);
+    sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out");
 }
 
 void RouterInPortOpCalc::trySend() {

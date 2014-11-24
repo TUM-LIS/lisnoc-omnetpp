@@ -34,7 +34,7 @@ void Source::initialize()
 
 void Source::genPacket()
 {
-    for (int f = 0; f < 3; f++) {
+    for (int f = 0; f < 8; f++) {
         LISNoCFlit *flit = new LISNoCFlit();
         flit->setVC(0);
         flit->setDstId(1);
@@ -59,6 +59,10 @@ void Source::handleMessageGrant(LISNoCFlowControlMsg *msg)
 {
     ASSERT(m_queue.getLength() > 0);
 
+    if (!msg->getAck()) {
+        return;
+    }
+
     sendDelayed((cMessage*)m_queue.pop(), SIMTIME_ZERO, "out", 0);
 
     if (m_queue.getLength() > 0 && !m_trySendMessage.isScheduled()) {
@@ -76,7 +80,7 @@ void Source::handleMessage(cMessage *msg)
         } else if (msg == &m_trySendMessage) {
             trySend();
         }
-    } else {
+    } else if (msg->getKind() == LISNOC_GRANT){
         handleMessageGrant((LISNoCFlowControlMsg*) msg);
     }
 }

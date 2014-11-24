@@ -46,16 +46,18 @@ void RouterBuffer::trySend()
 
 void RouterBuffer::handleIncomingRequest(LISNoCFlowControlMsg *msg)
 {
-    // This is from the incoming port
-    if (m_buffer.getLength() < m_maxfill) {
-        msg->setKind(LISNOC_GRANT);
-        sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out");
-    }
+    msg->setKind(LISNOC_GRANT);
+    msg->setAck(m_buffer.getLength() < m_maxfill);
+    sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out");
 }
 
 void RouterBuffer::handleIncomingGrant(LISNoCFlowControlMsg *msg)
 {
     ASSERT(m_buffer.getLength() >= 1);
+
+    if (!msg->getAck()) {
+        return;
+    }
 
     sendDelayed((cMessage*) m_buffer.pop(), SIMTIME_ZERO, "out");
 
