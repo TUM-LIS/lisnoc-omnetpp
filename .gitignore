@@ -4,3 +4,5 @@ src/Makefile
 # Output files
 out/
 src/lisnoc
+src/LISNoC_m.h
+src/LISNoC_m.cc
