@@ -28,6 +28,7 @@ void RouterInPortOpCalc::initialize()
 
     // Todo: static XY selection for now
     m_routingFunction = new RoutingFunctionMeshXY(2, getIndex());
+
 }
 
 bool RouterInPortOpCalc::isRequestGranted(LISNoCFlowControlMsg *msg)
@@ -63,6 +64,8 @@ void RouterInPortOpCalc::doTransfer()
 
     send(m_storedFlit, "out");
     m_storedFlit = NULL;
+
+    tryLateGrant();
 }
 
 

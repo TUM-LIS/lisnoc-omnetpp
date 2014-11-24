@@ -25,6 +25,8 @@ void RouterBuffer::initialize()
 {
     // TODO: parameter
     m_maxfill = 4;
+
+    allowLateAck();
 }
 
 void RouterBuffer::handleIncomingFlit(LISNoCFlit *msg)

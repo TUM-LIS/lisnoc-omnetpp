@@ -18,12 +18,19 @@
 namespace lisnoc {
 
 LISNoCBaseModule::LISNoCBaseModule() {
-    // TODO Auto-generated constructor stub
+    m_allowLateAck = false;
     m_clock = simtime_t(2, SIMTIME_NS);
+
+    m_pendingRequestWithLateAck.first = false;
 }
 
 LISNoCBaseModule::~LISNoCBaseModule() {
     // TODO Auto-generated destructor stub
+}
+
+void LISNoCBaseModule::allowLateAck() {
+    m_allowLateAck = true;
+    m_flowControlMsg.setAllowLateAck(true);
 }
 
 void LISNoCBaseModule::requestTransfer() {
@@ -86,11 +93,33 @@ void LISNoCBaseModule::handleIncomingRequest(LISNoCFlowControlMsg *msg)
     msg->setKind(LISNOC_GRANT);
     msg->setAck(isRequestGranted(msg));
 
+    if (!msg->getAck() && msg->getAllowLateAck()) {
+        m_pendingRequestWithLateAck.first = true;
+        m_pendingRequestWithLateAck.second = simTime();
+    }
+
     if (hasGate("fc_grant_out", 0)) {
         sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out", 0);
     } else {
         sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out");
     }
 }
+
+void LISNoCBaseModule::tryLateGrant() {
+    if (m_pendingRequestWithLateAck.first) {
+        ASSERT(m_pendingRequestWithLateAck.second == simTime());
+        LISNoCFlowControlMsg *msg = new LISNoCFlowControlMsg();
+        msg->setKind(LISNOC_GRANT);
+        msg->setAck(true);
+        msg->setIsLateAck(true);
+
+        if (hasGate("fc_grant_out", 0)) {
+            sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out", 0);
+        } else {
+            sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out");
+        }
+    }
+}
+
 
 } /* namespace lisnoc */

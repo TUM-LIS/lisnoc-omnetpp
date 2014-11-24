@@ -27,10 +27,15 @@ public:
     LISNoCBaseModule();
     virtual ~LISNoCBaseModule();
 private:
+    bool m_allowLateAck;
     LISNoCFlowControlMsg m_flowControlMsg;
     cMessage m_selfTrigger;
     simtime_t m_clock;
+
+    std::pair<bool, simtime_t> m_pendingRequestWithLateAck;
 protected:
+    virtual void allowLateAck();
+
     virtual void handleMessage(cMessage *msg);
     virtual void handleIncomingRequest(LISNoCFlowControlMsg *msg);
     virtual void handleIncomingGrant(LISNoCFlowControlMsg *msg);
@@ -44,6 +49,7 @@ protected:
     virtual void doTransfer() = 0;
 
     virtual bool isRequestGranted(LISNoCFlowControlMsg *msg) = 0;
+    virtual void tryLateGrant();
 };
 
 } /* namespace lisnoc */

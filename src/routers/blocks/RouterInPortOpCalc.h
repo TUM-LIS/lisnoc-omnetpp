@@ -33,6 +33,7 @@ private:
 
     RoutingFunctionBase *m_routingFunction;
 
+
   protected:
     virtual void initialize();
     virtual void handleSelfMessage(cMessage *msg);
