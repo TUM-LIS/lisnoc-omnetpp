@@ -13,20 +13,23 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "LookupDimensionXY.h"
+#ifndef __LISNOC_ROUTERBUFFER_H_
+#define __LISNOC_ROUTERBUFFER_H_
+
+#include <omnetpp.h>
 
 namespace lisnoc {
 
-Define_Module(LookupDimensionXY);
-
-void LookupDimensionXY::initialize()
+/**
+ * TODO - Generated class
+ */
+class RouterBuffer : public cSimpleModule
 {
-    // TODO - Generated method body
-}
-
-void LookupDimensionXY::handleMessage(cMessage *msg)
-{
-    // TODO - Generated method body
-}
+  protected:
+    virtual void initialize();
+    virtual void handleMessage(cMessage *msg);
+};
 
 } //namespace
+
+#endif

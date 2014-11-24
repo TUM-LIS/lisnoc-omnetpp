@@ -18,6 +18,9 @@ package lisnoc.routers.blocks;
 //
 // TODO auto-generated module
 //
-simple LookupDimensionXY
+simple RouterInPortVcCalc
 {
+    gates:
+        input in;
+        output out;
 }

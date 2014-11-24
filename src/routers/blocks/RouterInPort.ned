@@ -13,20 +13,27 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "Buffer.h"
+package lisnoc.routers.blocks;
 
-namespace lisnoc {
-
-Define_Module(Buffer);
-
-void Buffer::initialize()
+module RouterInPort
 {
-    // TODO - Generated method body
+    parameters:
+        int nVCs;
+        
+    gates:
+        input in[nVCs];
+        output out[nVCs];
+        
+   	submodules:
+   	    buffer[nVCs]: RouterBuffer;
+   	    opCalc[nVCs]: RouterInPortOpCalc;
+   	    vcCalc[nVCs]: RouterInPortVcCalc;
+   	    
+   	 connections:
+   	     for i=0..(nVCs-1) {
+   	     	in[i] --> buffer[i].in;
+   	     	buffer[i].out --> opCalc[i].in;
+   	     	opCalc[i].out --> vcCalc[i].in;
+   	     	vcCalc[i].out --> out[i];
+   	     }   	     
 }
-
-void Buffer::handleMessage(cMessage *msg)
-{
-    // TODO - Generated method body
-}
-
-} //namespace

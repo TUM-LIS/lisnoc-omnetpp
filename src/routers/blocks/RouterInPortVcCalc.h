@@ -13,20 +13,23 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "RouterBuffered.h"
+#ifndef __LISNOC_ROUTERINPORTVCCALC_H_
+#define __LISNOC_ROUTERINPORTVCCALC_H_
+
+#include <omnetpp.h>
 
 namespace lisnoc {
 
-Define_Module(RouterBuffered);
-
-void RouterBuffered::initialize()
+/**
+ * TODO - Generated class
+ */
+class RouterInPortVcCalc : public cSimpleModule
 {
-    // TODO - Generated method body
-}
-
-void RouterBuffered::handleMessage(cMessage *msg)
-{
-    // TODO - Generated method body
-}
+  protected:
+    virtual void initialize();
+    virtual void handleMessage(cMessage *msg);
+};
 
 } //namespace
+
+#endif

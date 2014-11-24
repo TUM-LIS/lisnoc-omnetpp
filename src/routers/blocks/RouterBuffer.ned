@@ -13,23 +13,11 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#ifndef __LISNOC_BUFFER_H_
-#define __LISNOC_BUFFER_H_
+package lisnoc.routers.blocks;
 
-#include <omnetpp.h>
-
-namespace lisnoc {
-
-/**
- * TODO - Generated class
- */
-class Buffer : public cSimpleModule
-{
-  protected:
-    virtual void initialize();
-    virtual void handleMessage(cMessage *msg);
-};
-
-} //namespace
-
-#endif
+simple RouterBuffer
+{    
+    gates:
+        input in;
+        output out;
+}

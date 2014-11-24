@@ -13,8 +13,8 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#ifndef __LISNOC_LOOKUPDIMENSIONXY_H_
-#define __LISNOC_LOOKUPDIMENSIONXY_H_
+#ifndef __LISNOC_ROUTERSWITCH_H_
+#define __LISNOC_ROUTERSWITCH_H_
 
 #include <omnetpp.h>
 
@@ -23,7 +23,7 @@ namespace lisnoc {
 /**
  * TODO - Generated class
  */
-class LookupDimensionXY : public cSimpleModule
+class RouterSwitch : public cSimpleModule
 {
   protected:
     virtual void initialize();

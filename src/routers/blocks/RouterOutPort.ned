@@ -13,23 +13,23 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#ifndef __LISNOC_VCMUX_H_
-#define __LISNOC_VCMUX_H_
+package lisnoc.routers.blocks;
 
-#include <omnetpp.h>
-
-namespace lisnoc {
-
-/**
- * TODO - Generated class
- */
-class VCMux : public cSimpleModule
+module RouterOutPort
 {
-  protected:
-    virtual void initialize();
-    virtual void handleMessage(cMessage *msg);
-};
-
-} //namespace
-
-#endif
+    parameters:
+        int nVCs;
+        
+    gates:
+        input in[nVCs];
+        output out[nVCs];
+        
+    submodules:
+        buffer[nVCs]: RouterBuffer;
+        
+    connections:
+        for i=0..(nVCs-1) {
+         	in[i] --> buffer[i].in;
+         	buffer[i].out --> out[i];   
+        }            
+}

@@ -13,11 +13,20 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package lisnoc.routers.blocks;
+#include "RouterBuffer.h"
 
-//
-// TODO auto-generated module
-//
-simple VCMux
+namespace lisnoc {
+
+Define_Module(RouterBuffer);
+
+void RouterBuffer::initialize()
 {
+    // TODO - Generated method body
 }
+
+void RouterBuffer::handleMessage(cMessage *msg)
+{
+    // TODO - Generated method body
+}
+
+} //namespace

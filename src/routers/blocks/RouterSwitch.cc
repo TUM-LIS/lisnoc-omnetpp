@@ -13,18 +13,18 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "VCMux.h"
+#include "RouterSwitch.h"
 
 namespace lisnoc {
 
-Define_Module(VCMux);
+Define_Module(RouterSwitch);
 
-void VCMux::initialize()
+void RouterSwitch::initialize()
 {
     // TODO - Generated method body
 }
 
-void VCMux::handleMessage(cMessage *msg)
+void RouterSwitch::handleMessage(cMessage *msg)
 {
     // TODO - Generated method body
 }

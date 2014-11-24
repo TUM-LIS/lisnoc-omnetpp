@@ -15,9 +15,40 @@
 
 package lisnoc.routers.buffered;
 
-//
-// TODO auto-generated module
-//
-simple RouterBuffered
+import lisnoc.routers.blocks.RouterInPort;
+import lisnoc.routers.blocks.RouterOutPort;
+import lisnoc.routers.blocks.RouterSwitch;
+
+module RouterBuffered
 {
+    parameters:
+        int nPorts;
+        int nVCs;
+        
+    gates:
+        input in[nPorts*nVCs];
+        output out[nPorts*nVCs];
+        
+   	submodules:
+   		inPort[nPorts]: RouterInPort {
+   			parameters:
+   			    nVCs = nVCs;   
+   		}
+   		outPort[nPorts]: RouterOutPort {
+   		 	parameters:
+   		 	    nVCs = nVCs;
+   		}
+   		switch: RouterSwitch {
+   		 	parameters:
+   		 	    nPorts = nPorts;
+   		 	    nVCs = nVCs;   
+   		}
+   		
+   	connections:
+   	    for port=0..(nPorts-1), for vc=0..(nVCs-1) {
+			in[p*nVCs+vc] --> inPort[p].in[vc];
+			inPort[p].out[vc] --> switch.in[p*nVCs+vc];
+			switch.out[p*nVCs+vc] --> outPort[p].in[vc];
+			outPort[p].out[vc] --> out[p*nVCs+vc];		
+   	    }    
 }

@@ -15,9 +15,13 @@
 
 package lisnoc.routers.blocks;
 
-//
-// TODO auto-generated module
-//
-simple Buffer
+simple RouterSwitch
 {
+    parameters:
+        int nPorts;
+        int nVCs;
+        
+    gates:
+        input in[nPorts*nVCs];
+        output out[nPorts*nVCs];
 }
