@@ -19,7 +19,9 @@ module RouterInPort
 {
     parameters:
         int nVCs;
-        
+       
+    @display("i=block/fork"); 
+       
     gates:
         input in[nVCs];
         output out[nVCs];

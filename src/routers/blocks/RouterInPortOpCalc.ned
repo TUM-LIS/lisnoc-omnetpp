@@ -17,6 +17,8 @@ package lisnoc.routers.blocks;
 
 simple RouterInPortOpCalc
 {
+    @display("i=block/dispatch");
+    
     gates:
         input in;
         output out;

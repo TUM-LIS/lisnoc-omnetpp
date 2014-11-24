@@ -19,6 +19,8 @@ module RouterOutPort
 {
     parameters:
         int nVCs;
+
+    @display("i=block/join");
         
     gates:
         input in[nVCs];

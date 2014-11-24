@@ -24,6 +24,8 @@ module NetworkInterface
         int id;
         int nVCs;
 
+	@display("i=device/cpu");
+
     gates:
         // NI output
         output out[nVCs];

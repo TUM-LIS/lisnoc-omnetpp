@@ -17,6 +17,8 @@ package lisnoc.routers.blocks;
 
 simple RouterBuffer
 {    
+    @display("i=block/queue");
+    
     gates:
         input in;
         output out;

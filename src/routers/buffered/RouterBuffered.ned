@@ -25,6 +25,7 @@ module RouterBuffered
         int nPorts;
         int nVCs;
         
+    @display("i=abstract/router");
     gates:
         input in[nPorts*nVCs];
         output out[nPorts*nVCs];

@@ -20,6 +20,8 @@ package lisnoc.routers.blocks;
 //
 simple RouterInPortVcCalc
 {
+    @display("i=block/switch");
+    
     gates:
         input in;
         output out;
