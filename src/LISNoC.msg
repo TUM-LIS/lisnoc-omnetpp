@@ -17,7 +17,8 @@ namespace lisnoc;
 
 enum LISNoC_Message {
 	LISNOC_FLIT = 0;
-	LISNOC_RESPONSE = 1;
+	LISNOC_REQUEST = 1;
+	LISNOC_GRANT = 2;
 }
 
 packet LISNoCFlit {
@@ -29,6 +30,5 @@ packet LISNoCFlit {
   	uint8_t data[];
 }
 
-packet LISNoCResponse {
-	bool ack;
+packet LISNoCFlowControlMsg {
 }

@@ -15,11 +15,7 @@
 
 #include "RouterBuffer.h"
 
-#include <cassert>
-
-#define NEXT_CYCLE (simTime() + simtime_t(2,SIMTIME_NS))
-#define NEXT_FALLING (simTime() + simtime_t(1,SIMTIME_NS))
-#define NEXT_RISING (simTime() + simtime_t(1,SIMTIME_NS))
+#define NEXT_CYCLE (simTime() + simtime_t(2, SIMTIME_NS))
 
 namespace lisnoc {
 
@@ -33,36 +29,38 @@ void RouterBuffer::initialize()
 
 void RouterBuffer::handleIncomingFlit(LISNoCFlit *msg)
 {
-    LISNoCResponse *resp = new LISNoCResponse();
+    ASSERT(m_buffer.getLength() < m_maxfill);
 
-    if (m_buffer.getLength() < m_maxfill) {
-        m_buffer.insert(msg);
-        resp->setAck(true);
-        scheduleAt(NEXT_CYCLE, &m_timerMsg);
-    } else {
-        resp->setAck(false);
-    }
-
-    sendDelayed(resp,NEXT_FALLING,"out_fc");
+    m_buffer.insert(msg);
+    scheduleAt(NEXT_CYCLE, &m_timerMsg);
 }
 
 void RouterBuffer::trySend()
 {
-    assert(m_buffer.getLength() >= 1);
+    ASSERT(m_buffer.getLength() >= 1);
 
-    send((cMessage*) m_buffer.front(), "out");
+    m_flowControlMsg.setKind(LISNOC_REQUEST);
+
+    send(&m_flowControlMsg, "out");
 }
 
-void RouterBuffer::handleIncomingResponse(LISNoCResponse *msg)
+void RouterBuffer::handleIncomingRequest(LISNoCFlowControlMsg *msg)
 {
-    assert(m_buffer.getLength() >= 1);
-
-    if (msg->getAck()) {
-        m_buffer.pop();
+    // This is from the incoming port
+    if (m_buffer.getLength() < m_maxfill) {
+        msg->setKind(LISNOC_GRANT);
+        sendDelayed(msg, SIMTIME_ZERO, "in");
     }
+}
+
+void RouterBuffer::handleIncomingGrant(LISNoCFlowControlMsg *msg)
+{
+    ASSERT(m_buffer.getLength() >= 1);
+
+    sendDelayed((cMessage*) m_buffer.pop(), SIMTIME_ZERO, "out");
 
     if (m_buffer.getLength() >= 1) {
-         scheduleAt(NEXT_RISING, &m_timerMsg);
+         scheduleAt(NEXT_CYCLE, &m_timerMsg);
     }
 
 }
@@ -73,8 +71,10 @@ void RouterBuffer::handleMessage(cMessage *msg)
         trySend();
     } else if (msg->getKind() == LISNOC_FLIT) {
         handleIncomingFlit((LISNoCFlit*) msg);
-    } else if (msg->getKind() == LISNOC_RESPONSE) {
-        handleIncomingResponse((LISNoCResponse*) msg);
+    } else if (msg->getKind() == LISNOC_REQUEST) {
+        handleIncomingRequest((LISNoCFlowControlMsg*) msg);
+    } else if (msg->getKind() == LISNOC_GRANT) {
+        handleIncomingGrant((LISNoCFlowControlMsg*) msg);
     }
 }
 

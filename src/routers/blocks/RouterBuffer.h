@@ -31,11 +31,13 @@ private:
     cQueue m_buffer;
     int m_maxfill;
     cMessage m_timerMsg;
+    LISNoCFlowControlMsg m_flowControlMsg;
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
     virtual void handleIncomingFlit(LISNoCFlit *msg);
-    virtual void handleIncomingResponse(LISNoCResponse *msg);
+    virtual void handleIncomingRequest(LISNoCFlowControlMsg *msg);
+    virtual void handleIncomingGrant(LISNoCFlowControlMsg *msg);
     virtual void trySend();
 };
 
