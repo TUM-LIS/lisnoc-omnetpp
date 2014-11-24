@@ -19,26 +19,27 @@
 #include <omnetpp.h>
 
 #include <LISNoC_m.h>
+#include <LISNoCBaseModule.h>
 
 namespace lisnoc {
 
 /**
  * TODO - Generated class
  */
-class RouterBuffer : public cSimpleModule
+class RouterBuffer : public LISNoCBaseModule
 {
 private:
     cQueue m_buffer;
     int m_maxfill;
     cMessage m_timerMsg;
-    LISNoCFlowControlMsg m_flowControlMsg;
   protected:
     virtual void initialize();
-    virtual void handleMessage(cMessage *msg);
+    virtual void handleSelfMessage(cMessage *msg);
     virtual void handleIncomingFlit(LISNoCFlit *msg);
-    virtual void handleIncomingRequest(LISNoCFlowControlMsg *msg);
-    virtual void handleIncomingGrant(LISNoCFlowControlMsg *msg);
     virtual void trySend();
+
+    virtual void doTransfer();
+    virtual bool isRequestGranted(LISNoCFlowControlMsg *msg);
 };
 
 } //namespace

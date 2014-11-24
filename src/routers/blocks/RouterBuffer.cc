@@ -39,45 +39,29 @@ void RouterBuffer::trySend()
 {
     ASSERT(m_buffer.getLength() >= 1);
 
-    m_flowControlMsg.setKind(LISNOC_REQUEST);
-
-    send(&m_flowControlMsg, "fc_req_out");
+    requestTransfer();
 }
 
-void RouterBuffer::handleIncomingRequest(LISNoCFlowControlMsg *msg)
+void RouterBuffer::handleSelfMessage(cMessage *msg)
 {
-    msg->setKind(LISNOC_GRANT);
-    msg->setAck(m_buffer.getLength() < m_maxfill);
-    sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out");
+    trySend();
 }
 
-void RouterBuffer::handleIncomingGrant(LISNoCFlowControlMsg *msg)
+void RouterBuffer::doTransfer()
 {
     ASSERT(m_buffer.getLength() >= 1);
-
-    if (!msg->getAck()) {
-        return;
-    }
 
     sendDelayed((cMessage*) m_buffer.pop(), SIMTIME_ZERO, "out");
 
     if (m_buffer.getLength() >= 1) {
-         scheduleAt(NEXT_CYCLE, &m_timerMsg);
+        triggerSelf(1);
     }
-
 }
 
-void RouterBuffer::handleMessage(cMessage *msg)
+bool RouterBuffer::isRequestGranted(LISNoCFlowControlMsg *msg)
 {
-    if (msg->isSelfMessage()) {
-        trySend();
-    } else if (msg->getKind() == LISNOC_FLIT) {
-        handleIncomingFlit((LISNoCFlit*) msg);
-    } else if (msg->getKind() == LISNOC_REQUEST) {
-        handleIncomingRequest((LISNoCFlowControlMsg*) msg);
-    } else if (msg->getKind() == LISNOC_GRANT) {
-        handleIncomingGrant((LISNoCFlowControlMsg*) msg);
-    }
+    return (m_buffer.getLength() < m_maxfill);
 }
+
 
 } //namespace
