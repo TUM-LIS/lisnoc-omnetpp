@@ -18,6 +18,8 @@
 #include <cassert>
 
 #define NEXT_CYCLE (simTime() + simtime_t(2,SIMTIME_NS))
+#define NEXT_FALLING (simTime() + simtime_t(1,SIMTIME_NS))
+#define NEXT_RISING (simTime() + simtime_t(1,SIMTIME_NS))
 
 namespace lisnoc {
 
@@ -41,7 +43,7 @@ void RouterBuffer::handleIncomingFlit(LISNoCFlit *msg)
         resp->setAck(false);
     }
 
-    send(resp,"out_fc");
+    sendDelayed(resp,NEXT_FALLING,"out_fc");
 }
 
 void RouterBuffer::trySend()
@@ -57,8 +59,10 @@ void RouterBuffer::handleIncomingResponse(LISNoCResponse *msg)
 
     if (msg->getAck()) {
         m_buffer.pop();
-    } else {
-        scheduleAt(NEXT_CYCLE, m_timerMsg);
+    }
+
+    if (m_buffer.getLength() >= 1) {
+         scheduleAt(NEXT_RISING, m_timerMsg);
     }
 
 }
