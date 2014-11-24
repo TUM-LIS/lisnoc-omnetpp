@@ -34,4 +34,6 @@ packet LISNoCFlowControlMsg {
     bool ack; // In Grant
     bool allowLateAck; // In Request
 	bool isLateAck; // In Grant    
+    int VC; // In Request
+    int outputPort; // In Request
 }

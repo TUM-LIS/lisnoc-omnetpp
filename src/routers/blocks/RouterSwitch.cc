@@ -21,12 +21,31 @@ Define_Module(RouterSwitch);
 
 void RouterSwitch::initialize()
 {
-    // TODO - Generated method body
+    m_nVCs = par("nVCs");
+    m_nPorts = par("nPorts");
+
+    m_requests.resize(m_nPorts);
+    for (int p = 0; p < m_nPorts; p++) {
+        m_requests[p].resize(m_nVCs);
+    }
+}
+
+void RouterSwitch::handleMessageRequest(LISNoCFlowControlMsg *msg)
+{
+    LISNoCFlowControlMsg *req = &m_requests[msg->getOutputPort()][msg->getVC()];
+    if (!reg->isScheduled()) {
+        // This port has not been requested before in this cycle
+        send(req, "fc_req_out", msg->getVC());
+    }
 }
 
 void RouterSwitch::handleMessage(cMessage *msg)
 {
-    // TODO - Generated method body
+    if (msg->isSelfMessage()) {
+
+    } else if (msg->getKind() == LISNOC_REQUEST) {
+
+    }
 }
 
 } //namespace

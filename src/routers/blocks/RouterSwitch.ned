@@ -20,6 +20,8 @@ simple RouterSwitch
     parameters:
         int nPorts;
         int nVCs;
+    
+    @display("i=block/switch");
         
     gates:
         input in[nPorts*nVCs];

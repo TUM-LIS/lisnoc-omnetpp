@@ -17,6 +17,7 @@
 #define __LISNOC_ROUTERSWITCH_H_
 
 #include <omnetpp.h>
+#include <LISNoC_m.h>
 
 namespace lisnoc {
 
@@ -25,6 +26,11 @@ namespace lisnoc {
  */
 class RouterSwitch : public cSimpleModule
 {
+private:
+    int m_nVCs;
+    int m_nPorts;
+    cMessage m_selfSignal;
+    std::vector<std::vector<LISNoCFlowControlMsg> > m_requests;
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
