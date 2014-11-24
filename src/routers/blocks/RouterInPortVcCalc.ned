@@ -23,4 +23,7 @@ simple RouterInPortVcCalc
     gates:
         input in;
         output out;
+        
+        input fc_in;
+        output fc_out;
 }

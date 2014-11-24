@@ -29,6 +29,9 @@ module RouterBuffered
         input in[nPorts*nVCs];
         output out[nPorts*nVCs];
         
+        input fc_in[nPorts*nVCs];
+        output fc_out[nPorts*nVCs];
+        
    	submodules:
    		inPort[nPorts]: RouterInPort {
    			parameters:
@@ -49,6 +52,12 @@ module RouterBuffered
 			in[p*nVCs+vc] --> inPort[p].in[vc];
 			inPort[p].out[vc] --> switch.in[p*nVCs+vc];
 			switch.out[p*nVCs+vc] --> outPort[p].in[vc];
-			outPort[p].out[vc] --> out[p*nVCs+vc];		
+			outPort[p].out[vc] --> out[p*nVCs+vc];
+			
+			fc_in[p*nVCs+vc] --> outPort[p].fc_in[vc];
+			inPort[p].fc_out[vc] --> fc_out[p*nVCs+vc];
+			
+			switch.fc_out[p*nVCs+vc] --> inPort[p].fc_in[vc];
+			outPort[p].fc_out[vc] --> switch.fc_in[p*nVCs+vc];				
    	    }    
 }

@@ -24,12 +24,18 @@ module RouterOutPort
         input in[nVCs];
         output out[nVCs];
         
+        input fc_in[nVCs];
+        output fc_out[nVCs];
+        
     submodules:
         buffer[nVCs]: RouterBuffer;
         
     connections:
         for i=0..(nVCs-1) {
          	in[i] --> buffer[i].in;
-         	buffer[i].out --> out[i];   
+         	buffer[i].out --> out[i];
+         	
+         	fc_in[i] --> buffer[i].fc_in;
+         	buffer[i].fc_out --> fc_out[i];
         }            
 }

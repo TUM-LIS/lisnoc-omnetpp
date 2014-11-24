@@ -24,4 +24,7 @@ simple RouterSwitch
     gates:
         input in[nPorts*nVCs];
         output out[nPorts*nVCs];
+        
+        input fc_in[nPorts*nVCs];
+        output fc_out[nPorts*nVCs];
 }

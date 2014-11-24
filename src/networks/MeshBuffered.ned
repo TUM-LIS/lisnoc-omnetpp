@@ -44,5 +44,12 @@ network MeshBuffered {
 	    	
 	    	// add connection to local
 	    	
+	    	router[r*columns+c].fc_out[1*nVCs+vc] --> router[(r-1)*columns+c].fc_in[3*nVCs+vc] if r!=0;
+	    	router[r*columns+c].fc_out[2*nVCs+vc] --> router[r*columns+c-1].fc_in[4*nVCs+vc] if c!=0;
+	    	router[r*columns+c].fc_out[3*nVCs+vc] --> router[(r+1)*columns+c].fc_in[1*nVCs+vc] if r!=rows-1;
+	    	router[r*columns+c].fc_out[4*nVCs+vc] --> router[r*columns+c+1].fc_in[2*nVCs+vc] if c!=columns-1;
+	    	
+	    	// add connection to local
+	    	
 	    }         
 }
