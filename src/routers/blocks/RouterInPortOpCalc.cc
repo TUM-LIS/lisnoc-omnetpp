@@ -19,8 +19,6 @@
 #include <cassert>
 
 #define NEXT_CYCLE (simTime() + simtime_t(2,SIMTIME_NS))
-#define NEXT_FALLING (simTime() + simtime_t(1,SIMTIME_NS))
-#define NEXT_RISING (simTime() + simtime_t(1,SIMTIME_NS))
 
 namespace lisnoc {
 
@@ -31,7 +29,7 @@ void RouterInPortOpCalc::initialize()
     m_storedFlit = NULL;
 
     // Todo: static XY selection for now
-    m_routingFunction = new RoutingFunctionMeshXY(4, getIndex());
+    m_routingFunction = new RoutingFunctionMeshXY(2, getIndex());
 }
 
 void RouterInPortOpCalc::handleMessage(cMessage *msg)
@@ -40,45 +38,45 @@ void RouterInPortOpCalc::handleMessage(cMessage *msg)
         trySend();
     } else if (msg->getKind() == LISNOC_FLIT) {
         handleIncomingFlit((LISNoCFlit*) msg);
-    } else if (msg->getKind() == LISNOC_RESPONSE) {
-        handleIncomingResponse((LISNoCResponse*) msg);
+    } else if (msg->getKind() == LISNOC_REQUEST) {
+        handleIncomingRequest((LISNoCFlowControlMsg*) msg);
+    } else if (msg->getKind() == LISNOC_GRANT) {
+        handleIncomingGrant((LISNoCFlowControlMsg*) msg);
     }
 }
 
-void RouterInPortOpCalc::handleIncomingFlit(LISNoCFlit *msg) {
+void RouterInPortOpCalc::handleIncomingFlit(LISNoCFlit *msg)
+{
+    ASSERT(m_storedFlit == NULL);
 
-    LISNoCResponse *resp = new LISNoCResponse();
+    m_storedFlit = msg;
 
+    // do routing
+    m_routingFunction->doRouting(msg);
+
+}
+
+void RouterInPortOpCalc::handleIncomingGrant(LISNoCFlowControlMsg *msg)
+{
+    ASSERT(m_storedFlit != NULL);
+
+    send(m_storedFlit, "out");
+    m_storedFlit = NULL;
+}
+
+void RouterInPortOpCalc::handleIncomingRequest(LISNoCFlowControlMsg *msg)
+{
     if(m_storedFlit == NULL) {
-        m_storedFlit = msg;
-
-        // do routing
-        m_routingFunction->doRouting(msg);
-
-        resp->setAck(true);
-        scheduleAt(NEXT_CYCLE, &m_timerMsg);
-    } else {
-        resp->setAck(false);
+        msg->setKind(LISNOC_GRANT);
+        sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out");
     }
-
-    sendDelayed(resp,NEXT_FALLING,"out_fc");
-}
-
-void RouterInPortOpCalc::handleIncomingResponse(LISNoCResponse *msg) {
-
-    assert(m_storedFlit != NULL);
-
-    if (msg->getAck()) {
-        m_storedFlit = NULL;
-    } else {
-        scheduleAt(NEXT_RISING, &m_timerMsg);
-    }
-
 }
 
 void RouterInPortOpCalc::trySend() {
-    assert(m_storedFlit != NULL);
-    send(m_storedFlit, "out");
+    ASSERT(m_storedFlit != NULL);
+
+    m_flowControlMessage.setKind(LISNOC_REQUEST);
+    sendDelayed(&m_flowControlMessage, SIMTIME_ZERO, "fc_req_out");
 }
 
 } //namespace

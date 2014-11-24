@@ -29,8 +29,10 @@ void RouterInPortVcCalc::handleMessage(cMessage *msg)
 {
     if (msg->getKind() == LISNOC_FLIT) {
         send(msg, "out");
-    } else if (msg->getKind() == LISNOC_RESPONSE) {
-        send(msg, "fc_out");
+    } else if (msg->getKind() == LISNOC_REQUEST) {
+        send(msg, "fc_req_out");
+    } else if (msg->getKind() == LISNOC_GRANT) {
+        send(msg, "fc_grant_out");
     }
 }
 

@@ -28,7 +28,7 @@ module RouterInPort
         input fc_grant_in[nVCs];
         
         output fc_req_out[nVCs];
-        output fc_grant_out[nVSs];
+        output fc_grant_out[nVCs];
         
    	submodules:
    	    buffer[nVCs]: RouterBuffer;

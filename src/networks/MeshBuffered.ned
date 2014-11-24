@@ -22,8 +22,8 @@ import lisnoc.ni.NetworkInterface;
 
 network MeshBuffered {
 	parameters:
-	    int columns = default(4);
-	    int rows = default(4);
+	    int columns = default(2);
+	    int rows = default(2);
 	    int nPorts = 5;
 	    int nVCs = default(1);
 	    
@@ -44,22 +44,27 @@ network MeshBuffered {
 	    
 	    // LOCAL = 0, NORTH = 1, EAST = 2, SOUTH = 3, WEST = 4
 	    for r=0..(rows-1), for c=0..(columns-1), for vc=0..(nVCs-1) {
-	        router[r*columns+c].out[0*nVCs+vc] --> ni[r*columns+c].in[vc];
 	    	router[r*columns+c].out[1*nVCs+vc] --> router[(r-1)*columns+c].in[3*nVCs+vc] if r!=0;
 	    	router[r*columns+c].out[2*nVCs+vc] --> router[r*columns+c-1].in[4*nVCs+vc] if c!=0;
 	    	router[r*columns+c].out[3*nVCs+vc] --> router[(r+1)*columns+c].in[1*nVCs+vc] if r!=rows-1;
 	    	router[r*columns+c].out[4*nVCs+vc] --> router[r*columns+c+1].in[2*nVCs+vc] if c!=columns-1;
 	    	
-	    	router[r*columns+c].fc_req_out[0*nVCs+vc] --> ni[r*columns+c].fc_req_in[vc];
 	    	router[r*columns+c].fc_req_out[1*nVCs+vc] --> router[(r-1)*columns+c].fc_req_in[3*nVCs+vc] if r!=0;
 	    	router[r*columns+c].fc_req_out[2*nVCs+vc] --> router[r*columns+c-1].fc_req_in[4*nVCs+vc] if c!=0;
 	    	router[r*columns+c].fc_req_out[3*nVCs+vc] --> router[(r+1)*columns+c].fc_req_in[1*nVCs+vc] if r!=rows-1;
 	    	router[r*columns+c].fc_req_out[4*nVCs+vc] --> router[r*columns+c+1].fc_req_in[2*nVCs+vc] if c!=columns-1;
 	    	
-	    	router[r*columns+c].fc_grant_out[0*nVCs+vc] --> ni[r*columns+c].fc_grant_in[vc];
 	    	router[r*columns+c].fc_grant_out[1*nVCs+vc] --> router[(r-1)*columns+c].fc_grant_in[3*nVCs+vc] if r!=0;
 	    	router[r*columns+c].fc_grant_out[2*nVCs+vc] --> router[r*columns+c-1].fc_grant_in[4*nVCs+vc] if c!=0;
 	    	router[r*columns+c].fc_grant_out[3*nVCs+vc] --> router[(r+1)*columns+c].fc_grant_in[1*nVCs+vc] if r!=rows-1;
 	    	router[r*columns+c].fc_grant_out[4*nVCs+vc] --> router[r*columns+c+1].fc_grant_in[2*nVCs+vc] if c!=columns-1;
+	    	
+	        router[r*columns+c].out[0*nVCs+vc] --> ni[r*columns+c].in[vc];
+	    	router[r*columns+c].fc_req_out[0*nVCs+vc] --> ni[r*columns+c].fc_req_in[vc];
+	    	ni[r*columns+c].fc_grant_out[vc] --> router[r*columns+c].fc_grant_in[0*nVCs+vc];
+	
+	    	ni[r*columns+c].out[vc] --> router[r*columns+c].in[0*nVCs+vc];
+	    	ni[r*columns+c].fc_req_out[vc] --> router[r*columns+c].fc_req_in[0*nVCs+vc];
+	    	router[r*columns+c].fc_grant_out[0*nVCs+vc] --> ni[r*columns+c].fc_grant_in[vc];	    	
 	    }         
 }

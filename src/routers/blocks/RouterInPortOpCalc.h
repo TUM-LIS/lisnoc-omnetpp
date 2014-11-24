@@ -32,11 +32,14 @@ private:
 
     RoutingFunctionBase *m_routingFunction;
 
+    LISNoCFlowControlMsg m_flowControlMessage;
+
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
     virtual void handleIncomingFlit(LISNoCFlit *msg);
-    virtual void handleIncomingResponse(LISNoCResponse *msg);
+    virtual void handleIncomingRequest(LISNoCFlowControlMsg *msg);
+    virtual void handleIncomingGrant(LISNoCFlowControlMsg *msg);
     virtual void trySend();
 };
 
