@@ -50,7 +50,7 @@ void RouterBuffer::trySend()
 {
     assert(m_buffer.getLength() >= 1);
 
-    send(m_buffer.front(),"out");
+    send((cMessage*) m_buffer.front(), "out");
 }
 
 void RouterBuffer::handleIncomingResponse(LISNoCResponse *msg)
@@ -62,7 +62,7 @@ void RouterBuffer::handleIncomingResponse(LISNoCResponse *msg)
     }
 
     if (m_buffer.getLength() >= 1) {
-         scheduleAt(NEXT_RISING, m_timerMsg);
+         scheduleAt(NEXT_RISING, &m_timerMsg);
     }
 
 }
