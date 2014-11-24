@@ -13,19 +13,36 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package lisnoc.simulations;
-
-import lisnoc.ni.Source;
-import lisnoc.ni.Sink;
+package lisnoc.ni;
 
 //
-// Sample network, consisting of a source and a sink.
+// TODO auto-generated type
 //
-network SourceSink
+module NetworkInterface
 {
+    parameters:
+        int nVCs;
+    
+    gates:
+        input in[nVCs];
+        output out[nVCs];
+        output fc_out[nVCs];
+        input fc_in[nVCs];
+        
     submodules:
-        source: Source;
-        sink: Sink;
+        sink: Sink {
+            @display("p=43,48");
+        }
+        source: Source {
+            @display("p=109,48");
+        }
+        
     connections:
-        source.out --> sink.in;
+	    for vc=0..(nVCs-1) {
+			source.out[vc] --> out[vc];
+			fc_in[vc] --> source.fc_in[vc];
+			sink.fc_out[vc] --> fc_out[vc];
+			in[vc] --> sink.in[vc];
+   	    }    
+        
 }

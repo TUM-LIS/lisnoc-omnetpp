@@ -21,7 +21,10 @@ package lisnoc.ni;
 simple Sink
 {
     parameters:
+        int nVCs = default(1);
+
         @display("i=block/sink");
     gates:
-        input in;
+        input in[nVCs];
+        output fc_out[nVCs];
 }

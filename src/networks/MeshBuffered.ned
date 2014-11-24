@@ -18,6 +18,7 @@
 package lisnoc.networks;
 
 import lisnoc.routers.buffered.RouterBuffered;
+import lisnoc.ni.NetworkInterface;
 
 network MeshBuffered {
 	parameters:
@@ -33,6 +34,11 @@ network MeshBuffered {
 	    	    nVCs = nVCs;   
 	    }
 	    
+	    ni[columns*rows]: NetworkInterface {
+	     	parameters:
+	     	    nVCs = nVCs;   
+	    }
+	    
 	connections allowunconnected:
 	    
 	    // LOCAL = 0, NORTH = 1, EAST = 2, SOUTH = 3, WEST = 4
@@ -41,15 +47,14 @@ network MeshBuffered {
 	    	router[r*columns+c].out[2*nVCs+vc] --> router[r*columns+c-1].in[4*nVCs+vc] if c!=0;
 	    	router[r*columns+c].out[3*nVCs+vc] --> router[(r+1)*columns+c].in[1*nVCs+vc] if r!=rows-1;
 	    	router[r*columns+c].out[4*nVCs+vc] --> router[r*columns+c+1].in[2*nVCs+vc] if c!=columns-1;
-	    	
-	    	// add connection to local
-	    	
 	    	router[r*columns+c].fc_out[1*nVCs+vc] --> router[(r-1)*columns+c].fc_in[3*nVCs+vc] if r!=0;
 	    	router[r*columns+c].fc_out[2*nVCs+vc] --> router[r*columns+c-1].fc_in[4*nVCs+vc] if c!=0;
 	    	router[r*columns+c].fc_out[3*nVCs+vc] --> router[(r+1)*columns+c].fc_in[1*nVCs+vc] if r!=rows-1;
 	    	router[r*columns+c].fc_out[4*nVCs+vc] --> router[r*columns+c+1].fc_in[2*nVCs+vc] if c!=columns-1;
 	    	
-	    	// add connection to local
-	    	
+	    	ni[r*columns+c].out[vc] --> router[r*columns+c].in[0*nVCs+vc];
+	    	router[r*columns+c].out[0*nVCs+vc] --> ni[r*columns+c].in[vc];
+	    	ni[r*columns+c].fc_out[vc] --> router[r*columns+c].fc_in[0*nVCs+vc];
+	    	router[r*columns+c].fc_out[0*nVCs+vc] --> ni[r*columns+c].fc_in[vc];
 	    }         
 }
