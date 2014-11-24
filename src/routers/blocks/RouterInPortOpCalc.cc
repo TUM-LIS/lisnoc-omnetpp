@@ -17,7 +17,7 @@
 
 namespace lisnoc {
 
-Define_Module(RouterInPortOPCalc);
+Define_Module(RouterInPortOpCalc);
 
 void RouterInPortOpCalc::initialize()
 {
