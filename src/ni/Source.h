@@ -18,6 +18,8 @@
 
 #include <omnetpp.h>
 
+#include <LISNoC_m.h>
+
 namespace lisnoc {
 
 /**
@@ -26,15 +28,18 @@ namespace lisnoc {
 class Source : public cSimpleModule
 {
   private:
-    cMessage *timerMessage;
-
-  public:
-     Source();
-     virtual ~Source();
+    int m_id;
+    cMessage m_timerMessage;
+    cMessage m_trySendMessage;
+    LISNoCFlowControlMsg m_flowControlMessage;
+    cQueue m_queue;
 
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
+    virtual void handleMessageGrant(LISNoCFlowControlMsg *msg);
+    virtual void genPacket();
+    virtual void trySend();
 };
 
 }; // namespace

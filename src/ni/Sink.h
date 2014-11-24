@@ -18,6 +18,8 @@
 
 #include <omnetpp.h>
 
+#include <LISNoC_m.h>
+
 namespace lisnoc {
 
 /**
@@ -25,17 +27,11 @@ namespace lisnoc {
  */
 class Sink : public cSimpleModule
 {
-  private:
-    // state
-    simtime_t lastArrival;
-
-    // statistics
-    cDoubleHistogram iaTimeHistogram;
-    cOutVector arrivalsVector;
-
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
+    virtual void handleMessageFlit(LISNoCFlit *msg);
+    virtual void handleMessageRequest(LISNoCFlowControlMsg *msg);
     virtual void finish();
 };
 

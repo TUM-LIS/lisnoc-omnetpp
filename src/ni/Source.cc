@@ -15,34 +15,66 @@
 
 #include "Source.h"
 
+#include <LISNoC_m.h>
+
 namespace lisnoc {
 
 Define_Module(Source);
 
-Source::Source()
-{
-    timerMessage = NULL;
-}
-
-Source::~Source()
-{
-    cancelAndDelete(timerMessage);
-}
+#define DELAY (simTime() + simtime_t(200,SIMTIME_NS))
+#define NEXT_CYCLE (simTime() + simtime_t(2,SIMTIME_NS))
 
 void Source::initialize()
 {
-    timerMessage = new cMessage("timer");
-    scheduleAt(simTime(), timerMessage);
+    m_id = par("id");
+    if (m_id == 0) {
+        scheduleAt(simTime(), &m_timerMessage);
+    }
+}
+
+void Source::genPacket()
+{
+    for (int f = 0; f < 8; f++) {
+        LISNoCFlit *flit = new LISNoCFlit();
+        flit->setVC(0);
+        flit->setDstId(1);
+
+        m_queue.insert(flit);
+    }
+
+    if (!m_trySendMessage.isScheduled()) {
+        scheduleAt(simTime(), &m_trySendMessage);
+    }
+}
+
+void Source::trySend()
+{
+    ASSERT(m_queue.getLength() > 0);
+
+    m_flowControlMessage.setKind(LISNOC_REQUEST);
+    send(&m_flowControlMessage, "fc_req_out", 0);
+
+}
+
+void Source::handleMessageGrant(LISNoCFlowControlMsg *msg)
+{
+    ASSERT(m_queue.getLength() > 0);
+
+    sendDelayed((cMessage*)m_queue.pop(), SIMTIME_ZERO, "out");
 }
 
 void Source::handleMessage(cMessage *msg)
 {
-    ASSERT(msg==timerMessage);
-
-    cMessage *job = new cMessage("job");
-    send(job, "out");
-
-    scheduleAt(simTime()+par("sendInterval").doubleValue(), timerMessage);
+    if (msg->isSelfMessage()) {
+        if (msg == &m_timerMessage) {
+            genPacket();
+            scheduleAt(DELAY, &m_timerMessage);
+        } else if (msg == &m_trySendMessage) {
+            trySend();
+        }
+    } else {
+        handleMessageGrant((LISNoCFlowControlMsg*) msg);
+    }
 }
 
 }; // namespace

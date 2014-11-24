@@ -36,7 +36,8 @@ network MeshBuffered {
 	    
 	    ni[columns*rows]: NetworkInterface {
 	     	parameters:
-	     	    nVCs = nVCs;   
+	     	    nVCs = nVCs;
+	     	    id = index;   
 	    }
 	    
 	connections allowunconnected:
