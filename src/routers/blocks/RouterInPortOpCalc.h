@@ -18,16 +18,26 @@
 
 #include <omnetpp.h>
 
+#include <LISNoC_m.h>
+
 namespace lisnoc {
 
-/**
- * TODO - Generated class
- */
+class RoutingFunctionBase;
+
 class RouterInPortOpCalc : public cSimpleModule
 {
+private:
+    LISNoCFlit *m_storedFlit;
+    cMessage m_timerMsg;
+
+    RoutingFunctionBase *m_routingFunction;
+
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
+    virtual void handleIncomingFlit(LISNoCFlit *msg);
+    virtual void handleIncomingResponse(LISNoCResponse *msg);
+    virtual void trySend();
 };
 
 } //namespace

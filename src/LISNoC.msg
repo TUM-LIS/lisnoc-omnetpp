@@ -25,6 +25,7 @@ packet LISNoCFlit {
 	int srcId;
   	int dstId;
   	int VC;
+  	int outputPort;
   	uint8_t data[];
 }
 
