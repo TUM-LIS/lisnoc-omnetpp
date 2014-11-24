@@ -17,34 +17,32 @@
 
 package lisnoc.networks;
 
-import ned.DelayChannel;
+import lisnoc.routers.buffered.RouterBuffered;
 
-module Node
-{
-    parameters:
-        @display("i=misc/node_vs");
-    gates:
-        inout g[];
-    connections allowunconnected:
-}
-
-//
-// A generated network with grid topology.
-//
-network MeshBuffered
-{
-    parameters:
-        int columns = default(4);
-        int rows = default(4);
-    submodules:
-        node[columns*rows]: Node {
-            @display("p=,,matrix,$columns");
-            gates:
-                g[4];
-        }
-    connections allowunconnected:
-        for i=0..rows-1, for j=0..columns-1 {
-            node[i*columns+j].g[1] <--> DelayChannel <--> node[(i+1)*columns+j].g[0] if i!=rows-1;
-            node[i*columns+j].g[3] <--> DelayChannel <--> node[i*columns+j+1].g[2] if j!=columns-1;
-        }
+network MeshBuffered {
+	parameters:
+	    int columns = default(4);
+	    int rows = default(4);
+	    int nPorts = 5;
+	    int nVCs = default(1);
+	    
+	submodules:
+	    router[columns*rows]: RouterBuffered {
+	    	parameters:
+	    	    nPorts = nPorts;
+	    	    nVCs = nVCs;   
+	    }
+	    
+	connections allowunconnected:
+	    
+	    // LOCAL = 0, NORTH = 1, EAST = 2, SOUTH = 3, WEST = 4
+	    for r=0..(rows-1), for c=0..(columns-1), for vc=0..(nVCs-1) {
+	    	router[r*columns+c].out[1*nVCs+vc] --> router[(r-1)*columns+c].in[3*nVCs+vc] if r!=0;
+	    	router[r*columns+c].out[2*nVCs+vc] --> router[r*columns+c-1].in[4*nVCs+vc] if c!=0;
+	    	router[r*columns+c].out[3*nVCs+vc] --> router[(r+1)*columns+c].in[1*nVCs+vc] if r!=rows-1;
+	    	router[r*columns+c].out[4*nVCs+vc] --> router[r*columns+c+1].in[2*nVCs+vc] if c!=columns-1;
+	    	
+	    	// add connection to local
+	    	
+	    }         
 }
