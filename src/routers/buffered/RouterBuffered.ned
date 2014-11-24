@@ -45,7 +45,7 @@ module RouterBuffered
    		}
    		
    	connections:
-   	    for port=0..(nPorts-1), for vc=0..(nVCs-1) {
+	    for p=0..(nPorts-1), for vc=0..(nVCs-1) {
 			in[p*nVCs+vc] --> inPort[p].in[vc];
 			inPort[p].out[vc] --> switch.in[p*nVCs+vc];
 			switch.out[p*nVCs+vc] --> outPort[p].in[vc];
