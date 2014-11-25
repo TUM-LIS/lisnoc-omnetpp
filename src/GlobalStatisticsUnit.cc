@@ -14,6 +14,7 @@
 // 
 
 #include "GlobalStatisticsUnit.h"
+#include <NIStatisticsUnit.h>
 
 namespace lisnoc {
 
@@ -77,6 +78,22 @@ void GlobalStatisticsUnit::handleMessage(cMessage *msg)
 {
     // should never happen
     ASSERT(false);
+}
+
+void GlobalStatisticsUnit::finish() {
+    cLongHistogram flitNetworkAccessLatency;
+    cLongHistogram flitNetworkLatency;
+    cLongHistogram flitTotalLatency;
+
+    std::map<int,NIStatisticsUnit*>::const_iterator iter;
+    for(iter=m_niStatisticsUnits.begin(); iter!=m_niStatisticsUnits.end(); iter++) {
+        flitNetworkAccessLatency.merge(iter->second->getHistFlitNetworkAccessLatency());
+        flitNetworkLatency.merge(iter->second->getHistFlitNetworkLatency());
+        flitTotalLatency.merge(iter->second->getHistFlitTotalLatency());
+    }
+    flitNetworkAccessLatency.recordAs("flit_network_access_latency");
+    flitNetworkLatency.recordAs("flit_network_latency");
+    flitTotalLatency.recordAs("flit_total_latency");
 }
 
 GlobalStatisticsUnit* GlobalStatisticsUnit::s_getGlobalStatisticsUnit() {

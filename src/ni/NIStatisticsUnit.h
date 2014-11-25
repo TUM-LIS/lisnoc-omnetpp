@@ -25,6 +25,18 @@ class NIStatisticsUnit : public cSimpleModule
   public:
     void collectFlitLatency(int networkAccessLatency, int networkLatency);
 
+    cLongHistogram* getHistFlitNetworkAccessLatency() {
+        return &m_flitNetworkAccessLatency;
+    }
+
+    cLongHistogram* getHistFlitNetworkLatency() {
+        return &m_flitNetworkLatency;
+    }
+
+    cLongHistogram* getHistFlitTotalLatency() {
+        return &m_flitTotalLatency;
+    }
+
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
