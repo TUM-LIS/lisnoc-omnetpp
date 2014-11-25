@@ -31,7 +31,7 @@ public:
 private:
     int m_nVCs;
     int m_nPorts;
-    cMessage m_selfSignal;
+    cMessage *m_selfSignal;
 
     class Arbiter {
         int m_port;

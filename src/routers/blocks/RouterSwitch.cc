@@ -39,6 +39,8 @@ void RouterSwitch::initialize()
             m_inputRequests[p][v] = NULL;
         }
     }
+
+    m_selfSignal = new cMessage;
 }
 
 RouterSwitch::Arbiter::Arbiter(int numports, int port, int vc)
@@ -169,11 +171,11 @@ void RouterSwitch::handleMessageGrant(LISNoCFlowControlMsg *msg)
 
     m_outputArbiters[port][vc]->setOutputReady(msg->getAck());
 
-    if (m_selfSignal.isScheduled()) {
-        cancelEvent(&m_selfSignal);
+    if (m_selfSignal->isScheduled()) {
+        cancelEvent(m_selfSignal);
     }
 
-    scheduleAt(simTime(), &m_selfSignal);
+    scheduleAt(simTime(), m_selfSignal);
 }
 
 void RouterSwitch::arbitrate()
@@ -242,6 +244,8 @@ RouterSwitch::~RouterSwitch()
             cancelEvent(&m_outputRequests[p][v]);
         }
     }
+
+    delete m_selfSignal;
 }
 
 } //namespace
