@@ -19,6 +19,7 @@ package lisnoc.networks;
 
 import lisnoc.routers.buffered.RouterBuffered;
 import lisnoc.ni.NetworkInterface;
+import lisnoc.GlobalStatisticsUnit;
 
 network MeshBuffered {
 	parameters:
@@ -42,6 +43,8 @@ network MeshBuffered {
 	     	    id = index;   
 	        @display("p=50,50,m,$columns,100,100");
 	    }
+	    
+	    globalStatitics: GlobalStatisticsUnit;
 	    
 	connections allowunconnected:
 	    

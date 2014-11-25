@@ -17,4 +17,8 @@ package lisnoc.routers.blocks;
 
 simple RouterStatisticsUnit
 {
+    parameters:
+        int routerId;
+        int nPorts;
+        int nVCs;
 }

@@ -53,7 +53,12 @@ module RouterBuffered
    		 	    nPorts = nPorts;
    		 	    nVCs = nVCs;   
    		}
-   		statisticsUnit: RouterStatisticsUnit;
+   		statisticsUnit: RouterStatisticsUnit {
+   		 	parameters:
+   		 	    routerId = id;
+   		 	    nPorts = nPorts;
+   		 	    nVCs = nVCs;   
+   		}
    		
    	connections:
 	    for p=0..(nPorts-1), for vc=0..(nVCs-1) {

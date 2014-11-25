@@ -14,14 +14,28 @@
 // 
 
 #include "RouterStatisticsUnit.h"
+#include <GlobalStatisticsUnit.h>
 
 namespace lisnoc {
 
 Define_Module(RouterStatisticsUnit);
 
-void RouterStatisticsUnit::initialize()
+void RouterStatisticsUnit::initialize(int stage)
 {
+    if(stage == 0) {
+        GlobalStatisticsUnit::s_getGlobalStatisticsUnit()->registerRouterStatisticsUnit(par("routerId"), this);
 
+        m_nPorts = par("nPorts");
+        m_nVCs = par("nVCs");
+
+        m_inBufferLat.resize(m_nPorts);
+        m_outBufferLat.resize(m_nPorts);
+
+        for(int p=0; p<m_nPorts; p++) {
+            m_inBufferLat[p].resize(m_nVCs);
+            m_outBufferLat[p].resize(m_nVCs);
+        }
+    }
 }
 
 void RouterStatisticsUnit::handleMessage(cMessage *msg)
@@ -30,17 +44,25 @@ void RouterStatisticsUnit::handleMessage(cMessage *msg)
     ASSERT(false);
 }
 
-void RouterStatisticsUnit::collectInBufferLatency(simtime_t latency) {
-    m_inBufferLat.collect(latency);
+void RouterStatisticsUnit::collectInBufferLatency(int port, int vc, simtime_t latency) {
+    m_inBufferLat[port][vc].collect(latency);
 }
 
-void RouterStatisticsUnit::collectOutBufferLatency(simtime_t latency) {
-    m_outBufferLat.collect(latency);
+void RouterStatisticsUnit::collectOutBufferLatency(int port, int vc, simtime_t latency) {
+    m_outBufferLat[port][vc].collect(latency);
 }
 
 void RouterStatisticsUnit::finish() {
-    m_inBufferLat.recordAs("inBufferLatency");
-    m_outBufferLat.recordAs("outBufferLatency");
+    char recordName[64];
+    for(int p=0; p<m_nPorts; p++) {
+        for(int vc=0; vc<m_nVCs; vc++) {
+            sprintf(recordName, "inBuffer_%i_vc_%i_latency", p, vc);
+            m_inBufferLat[p][vc].recordAs(recordName);
+
+            sprintf(recordName, "outBuffer_%i_vc_%i_latency", p, vc);
+            m_outBufferLat[p][vc].recordAs(recordName);
+        }
+    }
 }
 
 } //namespace

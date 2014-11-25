@@ -13,33 +13,11 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#ifndef __LISNOC_ROUTERSTATISTICSUNIT_H_
-#define __LISNOC_ROUTERSTATISTICSUNIT_H_
+package lisnoc;
 
-#include <omnetpp.h>
-
-namespace lisnoc {
-
-class RouterStatisticsUnit : public cSimpleModule
+//
+// TODO auto-generated module
+//
+simple GlobalStatisticsUnit
 {
-  public:
-    void collectInBufferLatency(int port, int vc, simtime_t latency);
-    void collectOutBufferLatency(int port, int vc, simtime_t latency);
-
-  protected:
-    virtual void initialize(int stage);
-    virtual void handleMessage(cMessage *msg);
-    virtual void finish();
-
-  private:
-
-    int m_nPorts;
-    int m_nVCs;
-
-    std::vector<std::vector<cLongHistogram> > m_inBufferLat;
-    std::vector<std::vector<cLongHistogram> > m_outBufferLat;
-};
-
-} //namespace
-
-#endif
+}

@@ -23,6 +23,8 @@
 
 namespace lisnoc {
 
+class RouterStatisticsUnit;
+
 /**
  * TODO - Generated class
  */
@@ -32,8 +34,11 @@ private:
     cQueue m_buffer;
     int m_maxfill;
     cMessage m_timerMsg;
+
+    RouterStatisticsUnit* m_routerSU;
+
   protected:
-    virtual void initialize();
+    virtual void initialize(int stage);
     virtual void handleSelfMessage(cMessage *msg);
     virtual void handleIncomingFlit(LISNoCFlit *msg);
     virtual void trySend();
