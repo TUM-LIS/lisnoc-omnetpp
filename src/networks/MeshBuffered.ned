@@ -31,7 +31,8 @@ network MeshBuffered {
 	    router[columns*rows]: RouterBuffered {
 	    	parameters:
 	    	    nPorts = nPorts;
-	    	    nVCs = nVCs;   
+	    	    nVCs = nVCs;
+	    	    id = index;   
 	        @display("p=100,100,m,$columns,100,100");
 	    }
 	    

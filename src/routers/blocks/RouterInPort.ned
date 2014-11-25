@@ -19,6 +19,7 @@ module RouterInPort
 {
     parameters:
         int nVCs;
+    	int routerId;
        
     @display("i=block/fork"); 
        
@@ -34,7 +35,10 @@ module RouterInPort
         
    	submodules:
    	    buffer[nVCs]: RouterBuffer;
-   	    opCalc[nVCs]: RouterInPortOpCalc;
+   	    opCalc[nVCs]: RouterInPortOpCalc {
+   	        parameters:
+   	            routerId = routerId;
+   	    }
    	    vcCalc[nVCs]: RouterInPortVcCalc;
    	    
    	 connections:

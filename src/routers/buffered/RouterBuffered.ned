@@ -24,6 +24,7 @@ module RouterBuffered
     parameters:
         int nPorts;
         int nVCs;
+        int id;
         
     @display("i=abstract/router");
     gates:
@@ -39,7 +40,8 @@ module RouterBuffered
    	submodules:
    		inPort[nPorts]: RouterInPort {
    			parameters:
-   			    nVCs = nVCs;   
+   			    nVCs = nVCs;
+   			    routerId = id;   
    		}
    		outPort[nPorts]: RouterOutPort {
    		 	parameters:

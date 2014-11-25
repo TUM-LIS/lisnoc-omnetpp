@@ -17,15 +17,16 @@ package lisnoc.routers.blocks;
 
 simple RouterInPortOpCalc
 {
+	parameters:
+    	int routerId;
     @display("i=block/dispatch");
-    
     gates:
         input in;
         output out;
-        
+
         input fc_req_in;
         input fc_grant_in;
-        
+
         output fc_req_out;
         output fc_grant_out;
 }
