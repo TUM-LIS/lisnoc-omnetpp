@@ -33,7 +33,7 @@ void GlobalStatisticsUnit::registerRouterStatisticsUnit(int routerId, RouterStat
     ASSERT(iter == m_routerStatisticsUnits.end());
 
     std::pair<int,RouterStatisticsUnit*> p =
-            std::make_pair<int,RouterStatisticsUnit*>(routerId, routerSU);
+            std::make_pair(routerId, routerSU);
 
     m_routerStatisticsUnits.insert(p);
 }
