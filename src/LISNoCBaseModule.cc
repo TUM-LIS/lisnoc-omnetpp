@@ -134,6 +134,8 @@ void LISNoCBaseModule::handleIncomingRequest(LISNoCFlowControlMsg *msg)
     if (!msg->getAck() && msg->getAllowLateAck()) {
         m_pendingRequestWithLateAck.first = true;
         m_pendingRequestWithLateAck.second = simTime();
+    } else {
+        m_pendingRequestWithLateAck.first = false;
     }
 
     if (hasGate("fc_grant_out", 0)) {
@@ -156,6 +158,7 @@ void LISNoCBaseModule::tryLateGrant() {
         } else {
             sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out");
         }
+        m_pendingRequestWithLateAck.first = false;
     }
 }
 
