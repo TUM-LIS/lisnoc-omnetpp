@@ -20,4 +20,5 @@ package lisnoc;
 //
 simple GlobalStatisticsUnit
 {
+    @display("i=block/buffer2");
 }

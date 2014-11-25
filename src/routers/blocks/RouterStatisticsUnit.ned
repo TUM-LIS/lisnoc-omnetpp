@@ -21,4 +21,6 @@ simple RouterStatisticsUnit
         int routerId;
         int nPorts;
         int nVCs;
+    
+    @display("i=block/buffer2");    
 }
