@@ -15,8 +15,6 @@
 
 #include "RouterBuffer.h"
 
-#define NEXT_CYCLE (simTime() + simtime_t(2, SIMTIME_NS))
-
 namespace lisnoc {
 
 Define_Module(RouterBuffer);
@@ -34,7 +32,7 @@ void RouterBuffer::handleIncomingFlit(LISNoCFlit *msg)
     ASSERT(m_buffer.getLength() < m_maxfill);
 
     m_buffer.insert(msg);
-    scheduleAt(NEXT_CYCLE, &m_timerMsg);
+    triggerSelf(1, &m_timerMsg);
 }
 
 void RouterBuffer::trySend()
@@ -56,7 +54,7 @@ void RouterBuffer::doTransfer()
     sendDelayed((cMessage*) m_buffer.pop(), SIMTIME_ZERO, "out");
 
     if (m_buffer.getLength() >= 1) {
-        triggerSelf(1);
+        triggerSelf(1, &m_timerMsg);
     }
 }
 
