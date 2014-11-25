@@ -23,14 +23,11 @@ Define_Module(RouterBuffer);
 
 void RouterBuffer::initialize(int stage)
 {
-    // TODO: check if this is correct at this location
-    LISNoCBaseModule::initialize();
-
     if(stage == 0) {
+        LISNoCBaseModule::initialize();
         // TODO: parameter
         m_maxfill = 4;
-
-        //allowLateAck();
+        allowLateAck();
     } else if(stage == 1) {
         GlobalStatisticsUnit* globalSU =
                 GlobalStatisticsUnit::s_getGlobalStatisticsUnit();

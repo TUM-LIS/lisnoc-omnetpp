@@ -17,6 +17,10 @@
 
 namespace lisnoc {
 
+LISNoCBaseModule::LISNoCBaseModule() : m_isInitialized(false)
+{
+}
+
 void LISNoCBaseModule::initialize() {
     m_allowLateAck = false;
     m_flowControlMsg.setAllowLateAck(false);

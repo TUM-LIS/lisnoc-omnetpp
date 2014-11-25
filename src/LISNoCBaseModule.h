@@ -23,13 +23,15 @@
 namespace lisnoc {
 
 class LISNoCBaseModule: public cSimpleModule {
+public:
+    LISNoCBaseModule();
 private:
     bool m_allowLateAck;
     LISNoCFlowControlMsg m_flowControlMsg;
     cMessage m_selfTrigger;
     simtime_t m_clock;
 
-    bool m_isInitialized = false;
+    bool m_isInitialized;
 
     std::pair<bool, simtime_t> m_pendingRequestWithLateAck;
 protected:
