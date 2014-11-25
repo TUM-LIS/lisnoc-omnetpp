@@ -13,38 +13,20 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-namespace lisnoc;
+package lisnoc.ni;
 
-enum LISNoC_Message {
-	LISNOC_FLIT = 0;
-	LISNOC_REQUEST = 1;
-	LISNOC_GRANT = 2;
-}
-
-packet LISNoCFlit {
-    int packetId;
-	int srcId;
-  	int dstId;
-  	int VC;
-  	int outputPort;
-  	uint8_t data[];
-  	int flitId;
-  	int isHead;
-  	int isTail;
-  	simtime_t generationTime;
-  	simtime_t sendTime;
-}
-
-packet LISNoCFlowControlMsg {
-    bool ack; // In Grant
-    bool allowLateAck; // In Request
-	bool isLateAck; // In Grant
-	
-	// Include control information from actual flit
-	int VC;
-	int outputPort;
-    int packetId;
-  	int flitId;
-	bool isHead;
-	bool isTail;
+//
+// Generates messages with a configurable interarrival time.
+//
+simple NISource
+{
+    parameters:
+        volatile double sendInterval @unit(s) = default(exponential(1s));
+        int nVCs = default(1);
+        int id;
+        @display("i=block/source");
+    gates:
+        output out[nVCs];
+        output fc_req_out[nVCs];
+        input fc_grant_in[nVCs];
 }

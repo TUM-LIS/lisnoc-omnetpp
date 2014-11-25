@@ -13,38 +13,29 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#ifndef __LISNOC_SOURCE_H
-#define __LISNOC_SOURCE_H
+#ifndef __LISNOC_NISTATISTICSUNIT_H_
+#define __LISNOC_NISTATISTICSUNIT_H_
 
 #include <omnetpp.h>
 
-#include <LISNoC_m.h>
-#include <LISNoCBaseModule.h>
-
 namespace lisnoc {
 
-/**
- * Generates messages; see NED file for more info.
- */
-class Source : public LISNoCBaseModule
+class NIStatisticsUnit : public cSimpleModule
 {
-  private:
-    int m_id;
-    cMessage m_timerMessage;
-    cMessage m_trySendMessage;
-    LISNoCFlowControlMsg m_flowControlMessage;
-    cQueue m_queue;
+  public:
+    void collectFlitLatency(int networkAccessLatency, int networkLatency);
 
   protected:
     virtual void initialize();
-    virtual void genPacket();
-    virtual void handleSelfMessage(cMessage *msg);
-    virtual void doTransfer();
-    virtual bool isRequestGranted(LISNoCFlowControlMsg *msg) { return false; }
-    virtual void handleIncomingFlit(LISNoCFlit *msg) { }
+    virtual void handleMessage(cMessage *msg);
+    virtual void finish();
 
+  private:
+    cLongHistogram m_flitNetworkAccessLatency;
+    cLongHistogram m_flitNetworkLatency;
+    cLongHistogram m_flitTotalLatency;
 };
 
-}; // namespace
+} //namespace
 
 #endif

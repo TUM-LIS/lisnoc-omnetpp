@@ -13,24 +13,44 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "Sink.h"
+#include "NISink.h"
+#include "NIStatisticsUnit.h"
+#include <GlobalStatisticsUnit.h>
 
 namespace lisnoc {
 
-Define_Module(Sink);
+Define_Module(NISink);
 
-void Sink::initialize()
-{
-    LISNoCBaseModule::initialize();
+int NISink::numInitStages() const {
+    return 2;
 }
 
-void Sink::handleIncomingFlit(LISNoCFlit *msg)
+void NISink::initialize(int stage)
+{
+    if(stage == 0) {
+        LISNoCBaseModule::initialize();
+    } else if(stage == 1) {
+        GlobalStatisticsUnit* globalSU =
+                GlobalStatisticsUnit::s_getGlobalStatisticsUnit();
+
+        m_niSU =
+                globalSU->getNIStatisticsUnit(par("id"));
+    }
+}
+
+void NISink::handleIncomingFlit(LISNoCFlit *msg)
 {
     std::cout << "[" << simTime() << "," << getFullPath() << "] Received flit" << std::endl;
+
+    m_niSU->collectFlitLatency(
+            (msg->getSendTime()-msg->getGenerationTime()).inUnit(SIMTIME_NS),
+            (simTime()-msg->getSendTime()).inUnit(SIMTIME_NS)
+            );
+
     delete(msg);
 }
 
-bool Sink::isRequestGranted(LISNoCFlowControlMsg *msg)
+bool NISink::isRequestGranted(LISNoCFlowControlMsg *msg)
 {
     return true;
 }

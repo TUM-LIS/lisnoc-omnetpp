@@ -13,32 +13,38 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#ifndef __LISNOC_ROUTERSTATISTICSUNIT_H_
-#define __LISNOC_ROUTERSTATISTICSUNIT_H_
+#ifndef __LISNOC_NISOURCE_H
+#define __LISNOC_NISOURCE_H
 
 #include <omnetpp.h>
 
+#include <LISNoC_m.h>
+#include <LISNoCBaseModule.h>
+
 namespace lisnoc {
 
-class RouterStatisticsUnit : public cSimpleModule
+/**
+ * Generates messages; see NED file for more info.
+ */
+class NISource : public LISNoCBaseModule
 {
-  public:
-    void collectBufferLatency(const char* type, int port, int vc, int latency);
+  private:
+    int m_id;
+    cMessage m_timerMessage;
+    cMessage m_trySendMessage;
+    LISNoCFlowControlMsg m_flowControlMessage;
+    cQueue m_queue;
 
   protected:
     virtual void initialize();
-    virtual void handleMessage(cMessage *msg);
-    virtual void finish();
+    virtual void genPacket();
+    virtual void handleSelfMessage(cMessage *msg);
+    virtual void doTransfer();
+    virtual bool isRequestGranted(LISNoCFlowControlMsg *msg) { return false; }
+    virtual void handleIncomingFlit(LISNoCFlit *msg) { }
 
-  private:
-
-    int m_nPorts;
-    int m_nVCs;
-
-    std::vector<std::vector<cLongHistogram> > m_inBufferLat;
-    std::vector<std::vector<cLongHistogram> > m_outBufferLat;
 };
 
-} //namespace
+}; // namespace
 
 #endif

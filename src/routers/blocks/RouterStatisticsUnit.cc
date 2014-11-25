@@ -20,21 +20,19 @@ namespace lisnoc {
 
 Define_Module(RouterStatisticsUnit);
 
-void RouterStatisticsUnit::initialize(int stage)
+void RouterStatisticsUnit::initialize()
 {
-    if(stage == 0) {
-        GlobalStatisticsUnit::s_getGlobalStatisticsUnit()->registerRouterStatisticsUnit(par("routerId"), this);
+    GlobalStatisticsUnit::s_getGlobalStatisticsUnit()->registerRouterStatisticsUnit(par("routerId"), this);
 
-        m_nPorts = par("nPorts");
-        m_nVCs = par("nVCs");
+    m_nPorts = par("nPorts");
+    m_nVCs = par("nVCs");
 
-        m_inBufferLat.resize(m_nPorts);
-        m_outBufferLat.resize(m_nPorts);
+    m_inBufferLat.resize(m_nPorts);
+    m_outBufferLat.resize(m_nPorts);
 
-        for(int p=0; p<m_nPorts; p++) {
-            m_inBufferLat[p].resize(m_nVCs);
-            m_outBufferLat[p].resize(m_nVCs);
-        }
+    for(int p=0; p<m_nPorts; p++) {
+        m_inBufferLat[p].resize(m_nVCs);
+        m_outBufferLat[p].resize(m_nVCs);
     }
 }
 

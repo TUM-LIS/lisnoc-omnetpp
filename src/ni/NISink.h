@@ -13,8 +13,8 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#ifndef __LISNOC_SINK_H
-#define __LISNOC_SINK_H
+#ifndef __LISNOC_NISINK_H
+#define __LISNOC_NISINK_H
 
 #include <omnetpp.h>
 
@@ -23,18 +23,25 @@
 
 namespace lisnoc {
 
+class NIStatisticsUnit;
+
 /**
  * Message sink; see NED file for more info.
  */
-class Sink : public LISNoCBaseModule
+class NISink : public LISNoCBaseModule
 {
   protected:
-    virtual void initialize();
+    virtual int numInitStages() const;
+    virtual void initialize(int stage);
     virtual void handleIncomingFlit(LISNoCFlit *msg);
     virtual void handleSelfMessage(cMessage *msg) {};
     virtual void doTransfer() {};
 
     virtual bool isRequestGranted(LISNoCFlowControlMsg *msg);
+
+  private:
+
+    NIStatisticsUnit *m_niSU;
 };
 
 }; // namespace

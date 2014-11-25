@@ -18,7 +18,7 @@ package lisnoc.ni;
 //
 // TODO auto-generated type
 //
-module NetworkInterface
+module NI
 {
     parameters:
         int id;
@@ -38,15 +38,19 @@ module NetworkInterface
         output fc_grant_out[nVCs];
 
     submodules:
-        sink: Sink {
+        sink: NISink {
             parameters:
             	id = id;
             @display("p=43,48");            
         }
-        source: Source {
+        source: NISource {
             parameters:
                 id = id;
             @display("p=109,48");
+        }
+        statisticsUnit: NIStatisticsUnit {
+            parameters:
+                id = id;
         }
 
     connections:

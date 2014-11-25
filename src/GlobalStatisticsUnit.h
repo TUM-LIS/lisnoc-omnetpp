@@ -21,6 +21,7 @@
 namespace lisnoc {
 
 class RouterStatisticsUnit;
+class NIStatisticsUnit;
 
 /**
  * TODO - Generated class
@@ -34,7 +35,9 @@ class GlobalStatisticsUnit : public cSimpleModule
   public:
     GlobalStatisticsUnit();
     void registerRouterStatisticsUnit(int routerId, RouterStatisticsUnit *routerSU);
+    void registerNIStatisticsUnit(int niId, NIStatisticsUnit *routerSU);
     RouterStatisticsUnit* getRouterStatisticsUnit(int routerId);
+    NIStatisticsUnit* getNIStatisticsUnit(int niId);
 
     static GlobalStatisticsUnit* s_getGlobalStatisticsUnit();
 
@@ -43,6 +46,7 @@ class GlobalStatisticsUnit : public cSimpleModule
     static GlobalStatisticsUnit* s_globalStatisticsUnit;
 
     std::map<int,RouterStatisticsUnit*> m_routerStatisticsUnits;
+    std::map<int,NIStatisticsUnit*> m_niStatisticsUnits;
 
 };
 

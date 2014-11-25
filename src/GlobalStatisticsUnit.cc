@@ -38,11 +38,32 @@ void GlobalStatisticsUnit::registerRouterStatisticsUnit(int routerId, RouterStat
     m_routerStatisticsUnits.insert(p);
 }
 
+void GlobalStatisticsUnit::registerNIStatisticsUnit(int niId, NIStatisticsUnit *niSU) {
+    std::map<int,NIStatisticsUnit*>::const_iterator iter =
+            m_niStatisticsUnits.find(niId);
+
+    ASSERT(iter == m_niStatisticsUnits.end());
+
+    std::pair<int,NIStatisticsUnit*> p =
+            std::make_pair(niId, niSU);
+
+    m_niStatisticsUnits.insert(p);
+}
+
 RouterStatisticsUnit* GlobalStatisticsUnit::getRouterStatisticsUnit(int routerId) {
     std::map<int,RouterStatisticsUnit*>::const_iterator iter =
             m_routerStatisticsUnits.find(routerId);
 
     ASSERT(iter != m_routerStatisticsUnits.end());
+
+    return iter->second;
+}
+
+NIStatisticsUnit* GlobalStatisticsUnit::getNIStatisticsUnit(int niId) {
+    std::map<int,NIStatisticsUnit*>::const_iterator iter =
+            m_niStatisticsUnits.find(niId);
+
+    ASSERT(iter != m_niStatisticsUnits.end());
 
     return iter->second;
 }

@@ -13,15 +13,15 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "Source.h"
+#include "NISource.h"
 
 #include <LISNoC_m.h>
 
 namespace lisnoc {
 
-Define_Module(Source);
+Define_Module(NISource);
 
-void Source::initialize()
+void NISource::initialize()
 {
     LISNoCBaseModule::initialize();
 
@@ -31,7 +31,7 @@ void Source::initialize()
     }
 }
 
-void Source::genPacket()
+void NISource::genPacket()
 {
     int numflits = 3;
     for (int f = 0; f < numflits; f++) {
@@ -43,6 +43,7 @@ void Source::genPacket()
         flit->setFlitId(f);
         flit->setIsHead(f==0);
         flit->setIsTail(f==numflits-1);
+        flit->setGenerationTime(simTime());
 
         m_queue.insert(flit);
     }
@@ -50,9 +51,11 @@ void Source::genPacket()
     requestTransfer((LISNoCFlit*) m_queue.front());
 }
 
-void Source::doTransfer()
+void NISource::doTransfer()
 {
     ASSERT(m_queue.getLength() > 0);
+
+    ((LISNoCFlit*) m_queue.front())->setSendTime(simTime());
 
     sendDelayed((cMessage*)m_queue.pop(), SIMTIME_ZERO, "out", 0);
 
@@ -62,7 +65,7 @@ void Source::doTransfer()
 
 }
 
-void Source::handleSelfMessage(cMessage *msg) {
+void NISource::handleSelfMessage(cMessage *msg) {
     ASSERT(msg == &m_timerMessage);
 
     genPacket();

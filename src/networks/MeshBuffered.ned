@@ -18,7 +18,7 @@
 package lisnoc.networks;
 
 import lisnoc.routers.buffered.RouterBuffered;
-import lisnoc.ni.NetworkInterface;
+import lisnoc.ni.NI;
 import lisnoc.GlobalStatisticsUnit;
 
 network MeshBuffered {
@@ -37,7 +37,7 @@ network MeshBuffered {
 	        @display("p=100,100,m,$columns,100,100");
 	    }
 	    
-	    ni[columns*rows]: NetworkInterface {
+	    ni[columns*rows]: NI {
 	     	parameters:
 	     	    nVCs = nVCs;
 	     	    id = index;   

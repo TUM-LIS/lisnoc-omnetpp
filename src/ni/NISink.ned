@@ -16,17 +16,17 @@
 package lisnoc.ni;
 
 //
-// Generates messages with a configurable interarrival time.
+// Consumes received messages and collects statistics
 //
-simple Source
+simple NISink
 {
     parameters:
-        volatile double sendInterval @unit(s) = default(exponential(1s));
         int nVCs = default(1);
-        int id;
-        @display("i=block/source");
+		int id;
+
+        @display("i=block/sink");
     gates:
-        output out[nVCs];
-        output fc_req_out[nVCs];
-        input fc_grant_in[nVCs];
+        input in[nVCs];
+        input fc_req_in[nVCs];
+        output fc_grant_out[nVCs];
 }

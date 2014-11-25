@@ -16,17 +16,10 @@
 package lisnoc.ni;
 
 //
-// Consumes received messages and collects statistics
+// TODO auto-generated module
 //
-simple Sink
+simple NIStatisticsUnit
 {
     parameters:
-        int nVCs = default(1);
-		int id;
-
-        @display("i=block/sink");
-    gates:
-        input in[nVCs];
-        input fc_req_in[nVCs];
-        output fc_grant_out[nVCs];
+        int id;
 }
