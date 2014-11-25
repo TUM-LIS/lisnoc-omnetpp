@@ -47,14 +47,20 @@ RouterSwitch::Arbiter::Arbiter(int numports, int port, int vc)
     m_port = port;
     m_vc = vc;
 
+    m_transmittingWorm = false;
+
     m_pending = false;
     m_requests.resize(numports, false);
+    m_requestsIsHead.resize(numports, false);
+    m_requestsIsTail.resize(numports, false);
 }
 
 void RouterSwitch::Arbiter::request(int port, int vc, bool head, bool tail)
 {
     ASSERT(vc == m_vc);
     m_requests[port] = true;
+    m_requestsIsHead[port] = head;
+    m_requestsIsTail[port] = tail;
 
     m_pendingOutputReply = false;
     m_pending = true;
@@ -71,10 +77,32 @@ int RouterSwitch::Arbiter::arbitrate()
 
     m_pending = false;
 
-    for (int p = 0; p < m_nPorts; p++) {
-        if (m_requests[p]) {
-            return p;
+    if(m_transmittingWorm) {
+
+        ASSERT(m_requestsIsHead[m_arbitratedPort] == false);
+
+        if(m_requestsIsTail[m_arbitratedPort] == true) {
+            m_transmittingWorm = false;
         }
+
+        return m_arbitratedPort;
+
+    } else {
+
+        for (int p = 0; p < m_nPorts; p++) {
+            if (m_requests[p]) {
+
+                ASSERT(m_requestsIsHead[p]);
+
+                if(m_requestsIsTail[p] == false) {
+                    m_arbitratedPort = p;
+                    m_transmittingWorm = true;
+                }
+
+                return p;
+            }
+        }
+
     }
 
     return -1;

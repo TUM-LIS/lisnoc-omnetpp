@@ -36,9 +36,15 @@ private:
         int m_vc;
         int m_nPorts;
         std::vector<bool> m_requests;
+        std::vector<bool> m_requestsIsHead;
+        std::vector<bool> m_requestsIsTail;
         bool m_pending;
         bool m_outputReady;
         bool m_pendingOutputReply;
+
+        bool m_transmittingWorm;
+        bool m_arbitratedPort;
+
     public:
         Arbiter(int numports, int port, int vc);
         void request(int port, int vc, bool head, bool tail);
