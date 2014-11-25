@@ -79,11 +79,6 @@ void NISource::handleSelfMessage(cMessage *msg) {
 }
 
 NISource::~NISource() {
-
-    while (!m_queue.empty()) {
-        LISNoCFlit *flit = (LISNoCFlit*) m_queue.pop();
-        delete flit;
-    }
     cancelAndDelete(m_timerMessage);
 }
 
