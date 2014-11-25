@@ -239,11 +239,11 @@ void RouterSwitch::handleMessage(cMessage *msg)
 
 RouterSwitch::~RouterSwitch()
 {
-    for (int p = 0; p < m_nPorts; p++) {
+    /*for (int p = 0; p < m_nPorts; p++) {
         for (int v = 0; v < m_nVCs; v++) {
             cancelEvent(&m_outputRequests[p][v]);
         }
-    }
+    }*/
 
     delete m_selfSignal;
 }
