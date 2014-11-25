@@ -27,7 +27,7 @@ void RouterInPortOpCalc::initialize()
     m_storedFlit = NULL;
 
     // Todo: static XY selection for now
-    m_routingFunction = new RoutingFunctionMeshXY(2, getIndex());
+    m_routingFunction = new RoutingFunctionMeshXY(4, par("routerId"));
 
 }
 

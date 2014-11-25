@@ -22,8 +22,8 @@ import lisnoc.ni.NetworkInterface;
 
 network MeshBuffered {
 	parameters:
-	    int columns = default(2);
-	    int rows = default(2);
+	    int columns = default(4);
+	    int rows = default(4);
 	    int nPorts = 5;
 	    int nVCs = default(1);
 	    

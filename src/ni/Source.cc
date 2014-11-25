@@ -34,7 +34,7 @@ void Source::genPacket()
     for (int f = 0; f < 8; f++) {
         LISNoCFlit *flit = new LISNoCFlit();
         flit->setVC(0);
-        flit->setDstId(1);
+        flit->setDstId(15);
 
         m_queue.insert(flit);
     }
