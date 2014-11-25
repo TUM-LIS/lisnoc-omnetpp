@@ -68,7 +68,11 @@ void RouterSwitch::Arbiter::request(int port, int vc, bool head, bool tail)
 
 bool RouterSwitch::Arbiter::pendingArbitration()
 {
-    return m_pending;
+    if (m_transmittingWorm) {
+        return m_requests[m_arbitratedPort];
+    } else {
+        return m_pending;
+    }
 }
 
 int RouterSwitch::Arbiter::arbitrate()
