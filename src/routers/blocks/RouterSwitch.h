@@ -30,10 +30,36 @@ private:
     int m_nVCs;
     int m_nPorts;
     cMessage m_selfSignal;
-    std::vector<std::vector<LISNoCFlowControlMsg> > m_requests;
+
+    class Arbiter {
+        int m_port;
+        int m_vc;
+        int m_nPorts;
+        std::vector<bool> m_requests;
+        bool m_pending;
+        bool m_outputReady;
+        bool m_pendingOutputReply;
+    public:
+        Arbiter(int numports, int port, int vc);
+        void request(int port, int vc, bool head, bool tail);
+        bool pendingArbitration();
+        int arbitrate();
+        void setOutputReady(bool ready);
+        bool getOutputReady();
+    };
+
+    std::vector<std::vector<Arbiter*> > m_outputArbiters;
+    std::vector<std::vector<LISNoCFlowControlMsg> > m_outputRequests;
+
+    std::vector<std::vector<LISNoCFlowControlMsg*> > m_inputRequests;
+
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
+    virtual void handleMessageRequest(LISNoCFlowControlMsg *msg);
+    virtual void handleMessageGrant(LISNoCFlowControlMsg *msg);
+    virtual void handleMessageFlit(LISNoCFlit *msg);
+    virtual void arbitrate();
 };
 
 } //namespace
