@@ -81,36 +81,45 @@ int RouterSwitch::Arbiter::arbitrate()
 
     m_pending = false;
 
-    if(m_transmittingWorm) {
-        // TODO: only if worm also requests
+    int arbp = -1;
 
+    if(m_transmittingWorm) {
+        ASSERT(m_requests[m_arbitratedPort]);
         ASSERT(m_requestsIsHead[m_arbitratedPort] == false);
 
         if(m_requestsIsTail[m_arbitratedPort] == true) {
             m_transmittingWorm = false;
         }
 
-        return m_arbitratedPort;
+        arbp = m_arbitratedPort;
 
     } else {
 
         for (int p = 0; p < m_nPorts; p++) {
-            if (m_requests[p]) {
+            int rrport = (p + m_arbitratedPort + 1) % m_nPorts;
+            if (m_requests[rrport]) {
 
-                ASSERT(m_requestsIsHead[p]);
+                ASSERT(m_requestsIsHead[rrport]);
 
-                if(m_requestsIsTail[p] == false) {
-                    m_arbitratedPort = p;
+                if(m_requestsIsTail[rrport] == false) {
+                    m_arbitratedPort = rrport;
                     m_transmittingWorm = true;
                 }
 
-                return p;
+                arbp = rrport;
+
+                break;
             }
         }
 
     }
 
-    return -1;
+    // Cleanup
+    for (int p = 0; p < m_nPorts; p++) {
+        m_requests[p] = false;
+    }
+
+    return arbp;
 }
 
 void RouterSwitch::Arbiter::setOutputReady(bool ready)
