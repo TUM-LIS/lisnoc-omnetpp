@@ -19,6 +19,8 @@ module RouterOutPort
 {
     parameters:
         int nVCs;
+        int routerId;
+        int portId;
 
     @display("i=block/join");
         
@@ -33,7 +35,13 @@ module RouterOutPort
         output fc_grant_out[nVCs];
         
     submodules:
-        buffer[nVCs]: RouterBuffer;
+        buffer[nVCs]: RouterBuffer {
+   	        parameters:
+   	            type = "out";
+   	            routerId = routerId;
+   	            portId = portId;
+   	            vcId = index;
+   	    }
         
     connections:
         for i=0..(nVCs-1) {

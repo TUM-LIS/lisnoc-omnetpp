@@ -44,12 +44,13 @@ void RouterStatisticsUnit::handleMessage(cMessage *msg)
     ASSERT(false);
 }
 
-void RouterStatisticsUnit::collectInBufferLatency(int port, int vc, simtime_t latency) {
-    m_inBufferLat[port][vc].collect(latency);
-}
-
-void RouterStatisticsUnit::collectOutBufferLatency(int port, int vc, simtime_t latency) {
-    m_outBufferLat[port][vc].collect(latency);
+void RouterStatisticsUnit::collectBufferLatency(const char *type, int port, int vc, int latency) {
+    ASSERT(initialized());
+    if (strcmp("in",type) == 0) {
+        m_inBufferLat[port][vc].collect(latency);
+    } else {
+        m_outBufferLat[port][vc].collect(latency);
+    }
 }
 
 void RouterStatisticsUnit::finish() {

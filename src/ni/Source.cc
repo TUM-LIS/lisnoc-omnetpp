@@ -33,10 +33,16 @@ void Source::initialize()
 
 void Source::genPacket()
 {
-    for (int f = 0; f < 3; f++) {
+    int numflits = 3;
+    for (int f = 0; f < numflits; f++) {
         LISNoCFlit *flit = new LISNoCFlit();
         flit->setVC(0);
         flit->setDstId(15);
+        flit->setBitLength(32);
+        flit->setByteLength(4);
+        flit->setFlitId(f);
+        flit->setIsHead(f==0);
+        flit->setIsTail(f==numflits-1);
 
         m_queue.insert(flit);
     }

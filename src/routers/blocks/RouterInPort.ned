@@ -20,6 +20,7 @@ module RouterInPort
     parameters:
         int nVCs;
     	int routerId;
+    	int portId;
        
     @display("i=block/fork"); 
        
@@ -34,7 +35,13 @@ module RouterInPort
         output fc_grant_out[nVCs];
         
    	submodules:
-   	    buffer[nVCs]: RouterBuffer;
+   	    buffer[nVCs]: RouterBuffer {
+   	        parameters:
+   	            type = "in";
+   	            routerId = routerId;
+   	            portId = portId;
+   	            vcId = index; 
+   	    }
    	    opCalc[nVCs]: RouterInPortOpCalc {
    	        parameters:
    	            routerId = routerId;

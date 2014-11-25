@@ -28,6 +28,9 @@ packet LISNoCFlit {
   	int VC;
   	int outputPort;
   	uint8_t data[];
+  	int flitId;
+  	int isHead;
+  	int isTail;
 }
 
 packet LISNoCFlowControlMsg {
@@ -38,4 +41,8 @@ packet LISNoCFlowControlMsg {
 	// Include control information from actual flit
 	int VC;
 	int outputPort;
+    int packetId;
+  	int flitId;
+	bool isHead;
+	bool isTail;
 }

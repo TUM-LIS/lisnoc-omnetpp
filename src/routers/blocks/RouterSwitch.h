@@ -43,7 +43,7 @@ private:
         bool m_pendingOutputReply;
 
         bool m_transmittingWorm;
-        bool m_arbitratedPort;
+        int m_arbitratedPort;
 
     public:
         Arbiter(int numports, int port, int vc);

@@ -17,6 +17,12 @@ package lisnoc.routers.blocks;
 
 simple RouterBuffer
 {    
+    parameters:
+        string type;
+        int routerId;
+        int portId;
+        int vcId;
+        
     @display("i=block/queue");
     
     gates:

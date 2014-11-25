@@ -78,6 +78,7 @@ int RouterSwitch::Arbiter::arbitrate()
     m_pending = false;
 
     if(m_transmittingWorm) {
+        // TODO: only if worm also requests
 
         ASSERT(m_requestsIsHead[m_arbitratedPort] == false);
 
@@ -132,7 +133,7 @@ void RouterSwitch::handleMessageRequest(LISNoCFlowControlMsg *msg)
     int inport = gateidx / m_nVCs;
     int invc = gateidx % m_nVCs;
 
-    arb->request(inport, invc, true, false);
+    arb->request(inport, invc, msg->getIsHead(), msg->getIsTail());
     ASSERT(m_inputRequests[inport][invc] == NULL);
     m_inputRequests[inport][invc] = msg;
 
@@ -176,6 +177,7 @@ void RouterSwitch::arbitrate()
             ASSERT(inport >= 0);
 
             LISNoCFlowControlMsg *msg = m_inputRequests[inport][v];
+            ASSERT(msg);
             msg->setKind(LISNOC_GRANT);
             msg->setAck(true);
             sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out", inport*m_nVCs+v);

@@ -24,7 +24,7 @@ LISNoCBaseModule::LISNoCBaseModule() : m_isInitialized(false)
 void LISNoCBaseModule::initialize() {
     m_allowLateAck = false;
     m_flowControlMsg.setAllowLateAck(false);
-    m_clock = simtime_t(2, SIMTIME_NS);
+    m_clock = simtime_t(1, SIMTIME_NS);
 
     m_pendingRequestWithLateAck.first = false;
 
@@ -50,6 +50,10 @@ void LISNoCBaseModule::requestTransfer(LISNoCFlit *msg) {
     if (msg) {
         m_flowControlMsg.setVC(msg->getVC());
         m_flowControlMsg.setOutputPort(msg->getOutputPort());
+        m_flowControlMsg.setPacketId(msg->getPacketId());
+        m_flowControlMsg.setFlitId(msg->getFlitId());
+        m_flowControlMsg.setIsHead(msg->getIsHead());
+        m_flowControlMsg.setIsTail(msg->getIsTail());
     }
 
     if (hasGate("fc_req_out", 0)) {
@@ -98,8 +102,7 @@ void LISNoCBaseModule::triggerSelf(unsigned int numcycles, cMessage *msg)
     ASSERT(!msg->isScheduled());
 
     simtime_t curtime = simTime();
-    ASSERT((curtime.remainderForUnit(SIMTIME_NS) == 0) &&
-            (curtime.inUnit(SIMTIME_NS) % 2 == 0));
+    ASSERT((curtime.remainderForUnit(SIMTIME_NS) == 0));
 
     scheduleAt(curtime + m_clock * numcycles, msg);
 }

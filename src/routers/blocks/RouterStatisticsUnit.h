@@ -23,8 +23,7 @@ namespace lisnoc {
 class RouterStatisticsUnit : public cSimpleModule
 {
   public:
-    void collectInBufferLatency(int port, int vc, simtime_t latency);
-    void collectOutBufferLatency(int port, int vc, simtime_t latency);
+    void collectBufferLatency(const char* type, int port, int vc, int latency);
 
   protected:
     virtual void initialize(int stage);

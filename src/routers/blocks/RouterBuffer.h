@@ -37,7 +37,11 @@ private:
 
     RouterStatisticsUnit* m_routerSU;
 
+    const char *m_type;
+    int m_portId;
+    int m_vcId;
   protected:
+    virtual int numInitStages() const { return 2; }
     virtual void initialize(int stage);
     virtual void handleSelfMessage(cMessage *msg);
     virtual void handleIncomingFlit(LISNoCFlit *msg);

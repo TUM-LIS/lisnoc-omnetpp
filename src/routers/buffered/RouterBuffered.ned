@@ -42,11 +42,14 @@ module RouterBuffered
    		inPort[nPorts]: RouterInPort {
    			parameters:
    			    nVCs = nVCs;
-   			    routerId = id;   
+   			    routerId = id;
+   			    portId = index;  
    		}
    		outPort[nPorts]: RouterOutPort {
    		 	parameters:
    		 	    nVCs = nVCs;
+   		 	    routerId = id;
+   		 	    portId = index;
    		}
    		switch: RouterSwitch {
    		 	parameters:

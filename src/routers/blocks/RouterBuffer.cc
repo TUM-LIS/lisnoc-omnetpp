@@ -28,6 +28,10 @@ void RouterBuffer::initialize(int stage)
         // TODO: parameter
         m_maxfill = 4;
         allowLateAck();
+
+        m_type = par("type");
+        m_portId = par("portId");
+        m_vcId = par("vcId");
     } else if(stage == 1) {
         GlobalStatisticsUnit* globalSU =
                 GlobalStatisticsUnit::s_getGlobalStatisticsUnit();
@@ -64,7 +68,12 @@ void RouterBuffer::doTransfer()
 {
     ASSERT(m_buffer.getLength() >= 1);
 
-    sendDelayed((cMessage*) m_buffer.pop(), SIMTIME_ZERO, "out");
+    cMessage *msg = (cMessage*) m_buffer.pop();
+    int delay = (simTime().inUnit(SIMTIME_NS) - msg->getArrivalTime().inUnit(SIMTIME_NS));
+
+    m_routerSU->collectBufferLatency(m_type, m_portId, m_vcId, delay);
+
+    sendDelayed((cMessage*) msg, SIMTIME_ZERO, "out");
 
     if (m_buffer.getLength() >= 1) {
         cancelEvent(&m_timerMsg);
