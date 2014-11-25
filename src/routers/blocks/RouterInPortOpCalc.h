@@ -27,6 +27,8 @@ class RoutingFunctionBase;
 
 class RouterInPortOpCalc : public LISNoCBaseModule
 {
+public:
+    virtual ~RouterInPortOpCalc();
 private:
     LISNoCFlit *m_storedFlit;
     cMessage m_timerMsg;

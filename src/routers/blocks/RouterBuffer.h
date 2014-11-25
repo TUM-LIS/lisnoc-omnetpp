@@ -30,6 +30,8 @@ class RouterStatisticsUnit;
  */
 class RouterBuffer : public LISNoCBaseModule
 {
+public:
+    virtual ~RouterBuffer();
 private:
     cQueue m_buffer;
     int m_maxfill;

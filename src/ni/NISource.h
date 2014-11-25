@@ -28,11 +28,12 @@ namespace lisnoc {
  */
 class NISource : public LISNoCBaseModule
 {
+protected:
+    virtual ~NISource();
+    virtual void finish();
   private:
     int m_id;
-    cMessage m_timerMessage;
-    cMessage m_trySendMessage;
-    LISNoCFlowControlMsg m_flowControlMessage;
+    cMessage *m_timerMessage;
     cQueue m_queue;
 
   protected:

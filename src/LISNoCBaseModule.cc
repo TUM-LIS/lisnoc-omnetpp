@@ -17,68 +17,68 @@
 
 namespace lisnoc {
 
-LISNoCBaseModule::LISNoCBaseModule() : m_isInitialized(false)
-{
-}
-
 void LISNoCBaseModule::initialize() {
     m_allowLateAck = false;
-    m_flowControlMsg.setAllowLateAck(false);
     m_clock = simtime_t(1, SIMTIME_NS);
 
     m_pendingRequestWithLateAck.first = false;
 
     m_isInitialized = true;
+
+    m_flowControlMsg = new LISNoCFlowControlMsg;
+    m_flowControlMsg->setAllowLateAck(false);
+
+    m_selfTrigger = new cMessage;
 }
 
 void LISNoCBaseModule::allowLateAck() {
     m_allowLateAck = true;
-    m_flowControlMsg.setAllowLateAck(true);
+    m_flowControlMsg->setAllowLateAck(true);
 }
 
 bool LISNoCBaseModule::canRequestTransfer(LISNoCFlit *msg)
 {
-    return (m_flowControlMsg.isScheduled() == false);
+    return (m_flowControlMsg->isScheduled() == false);
 }
 
 void LISNoCBaseModule::requestTransfer(LISNoCFlit *msg) {
-    ASSERT(m_flowControlMsg.isScheduled() == false);
+    ASSERT(m_flowControlMsg->isScheduled() == false);
 
-    m_flowControlMsg.setKind(LISNOC_REQUEST);
-    m_flowControlMsg.setAck(false);
+    m_flowControlMsg->setKind(LISNOC_REQUEST);
+    m_flowControlMsg->setAck(false);
 
     if (msg) {
-        m_flowControlMsg.setVC(msg->getVC());
-        m_flowControlMsg.setOutputPort(msg->getOutputPort());
-        m_flowControlMsg.setPacketId(msg->getPacketId());
-        m_flowControlMsg.setFlitId(msg->getFlitId());
-        m_flowControlMsg.setIsHead(msg->getIsHead());
-        m_flowControlMsg.setIsTail(msg->getIsTail());
+        m_flowControlMsg->setVC(msg->getVC());
+        m_flowControlMsg->setOutputPort(msg->getOutputPort());
+        m_flowControlMsg->setPacketId(msg->getPacketId());
+        m_flowControlMsg->setFlitId(msg->getFlitId());
+        m_flowControlMsg->setIsHead(msg->getIsHead());
+        m_flowControlMsg->setIsTail(msg->getIsTail());
     }
 
     if (hasGate("fc_req_out", 0)) {
-        send(&m_flowControlMsg, "fc_req_out", 0);
+        send(m_flowControlMsg, "fc_req_out", 0);
     } else {
-        send(&m_flowControlMsg, "fc_req_out");
+        send(m_flowControlMsg, "fc_req_out");
     }
 }
 
 void LISNoCBaseModule::requestTransferAfter(LISNoCFlit *msg, unsigned int numcycles) {
     ASSERT(m_isInitialized);
-    ASSERT(m_flowControlMsg.isScheduled() == false);
+    ASSERT(m_flowControlMsg->isScheduled() == false);
 
     if (msg) {
-        m_flowControlMsg.setVC(msg->getVC());
-        m_flowControlMsg.setOutputPort(msg->getOutputPort());
+        m_flowControlMsg->setVC(msg->getVC());
+        m_flowControlMsg->setOutputPort(msg->getOutputPort());
     }
 
-    scheduleAt(simTime() + m_clock * numcycles, &m_flowControlMsg);
+    scheduleAt(simTime() + m_clock * numcycles, m_flowControlMsg);
 }
 
 void LISNoCBaseModule::handleMessage(cMessage *msg)
 {
     if (msg->isSelfMessage()) {
-        if (msg == &m_flowControlMsg) {
+        if (msg == m_flowControlMsg) {
             requestTransfer(NULL);
         } else {
             handleSelfMessage(msg);
@@ -96,7 +96,7 @@ void LISNoCBaseModule::triggerSelf(unsigned int numcycles, cMessage *msg)
 {
     ASSERT(m_isInitialized);
     if (!msg) {
-        msg = &m_selfTrigger;
+        msg = m_selfTrigger;
     }
 
     ASSERT(!msg->isScheduled());
@@ -110,18 +110,18 @@ void LISNoCBaseModule::triggerSelf(unsigned int numcycles, cMessage *msg)
 void LISNoCBaseModule::handleIncomingGrant(LISNoCFlowControlMsg *msg)
 {
     if (!msg->getAck()) {
-        ASSERT(msg == &m_flowControlMsg); // not allowed for late ack
+        ASSERT(msg == m_flowControlMsg); // not allowed for late ack
         requestTransferAfter(NULL, 1);
         return;
     }
 
-    if (msg != &m_flowControlMsg) {
+    if (msg != m_flowControlMsg) {
         // late grant
         ASSERT(m_allowLateAck);
 
-        ASSERT(m_flowControlMsg.isScheduled());
+        ASSERT(m_flowControlMsg->isScheduled());
 
-        cancelEvent(&m_flowControlMsg);
+        cancelEvent(m_flowControlMsg);
 
         delete(msg);
     }
@@ -165,5 +165,15 @@ void LISNoCBaseModule::tryLateGrant() {
     }
 }
 
+void LISNoCBaseModule::finish()
+{
+    cancelEvent(m_flowControlMsg);
+}
+
+LISNoCBaseModule::~LISNoCBaseModule()
+{
+    cancelAndDelete(m_selfTrigger);
+    delete m_flowControlMsg;
+}
 
 } /* namespace lisnoc */

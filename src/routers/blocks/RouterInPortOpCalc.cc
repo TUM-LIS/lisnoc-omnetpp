@@ -70,5 +70,10 @@ void RouterInPortOpCalc::doTransfer()
     tryLateGrant();
 }
 
+RouterInPortOpCalc::~RouterInPortOpCalc()
+{
+    cancelEvent(&m_timerMsg);
+    delete m_storedFlit;
+}
 
 } //namespace

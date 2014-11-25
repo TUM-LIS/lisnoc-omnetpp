@@ -24,7 +24,7 @@ module NI
         int id;
         int nVCs;
 
-	@display("i=device/cpu");
+        @display("i=device/cpu");
 
     gates:
         // NI output
@@ -40,17 +40,18 @@ module NI
     submodules:
         sink: NISink {
             parameters:
-            	id = id;
-            @display("p=43,48");            
+                id = id;
+                @display("p=43,48");
         }
         source: NISource {
             parameters:
                 id = id;
-            @display("p=109,48");
+                @display("p=109,48");
         }
         statisticsUnit: NIStatisticsUnit {
             parameters:
                 id = id;
+                @display("p=232,70");
         }
 
     connections:

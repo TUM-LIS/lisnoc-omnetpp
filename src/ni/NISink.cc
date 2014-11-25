@@ -40,7 +40,7 @@ void NISink::initialize(int stage)
 
 void NISink::handleIncomingFlit(LISNoCFlit *msg)
 {
-    std::cout << "[" << simTime() << "," << getFullPath() << "] Received flit" << std::endl;
+   // std::cout << "[" << simTime() << "," << getFullPath() << "] Received flit" << std::endl;
 
     m_niSU->collectFlitLatency(
             (msg->getSendTime()-msg->getGenerationTime()).inUnit(SIMTIME_NS),

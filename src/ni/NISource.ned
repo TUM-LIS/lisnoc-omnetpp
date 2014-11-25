@@ -24,7 +24,10 @@ simple NISource
         volatile double sendInterval @unit(s) = default(exponential(1s));
         int nVCs = default(1);
         int id;
-        @display("i=block/source");
+        volatile int dstId = default(-1);
+        volatile int initialdelay = default(0);
+        volatile int genDelay = default(100);
+    @display("i=block/source");
     gates:
         output out[nVCs];
         output fc_req_out[nVCs];

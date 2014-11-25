@@ -53,6 +53,8 @@ RouterSwitch::Arbiter::Arbiter(int numports, int port, int vc)
     m_requests.resize(numports, false);
     m_requestsIsHead.resize(numports, false);
     m_requestsIsTail.resize(numports, false);
+
+    m_arbitratedPort = 0;
 }
 
 void RouterSwitch::Arbiter::request(int port, int vc, bool head, bool tail)
@@ -96,7 +98,7 @@ int RouterSwitch::Arbiter::arbitrate()
     } else {
 
         for (int p = 0; p < m_nPorts; p++) {
-            int rrport = (p + m_arbitratedPort + 1) % m_nPorts;
+            int rrport = (p + m_arbitratedPort + 1 + m_nPorts) % m_nPorts;
             if (m_requests[rrport]) {
 
                 ASSERT(m_requestsIsHead[rrport]);
@@ -230,6 +232,15 @@ void RouterSwitch::handleMessage(cMessage *msg)
         handleMessageGrant((LISNoCFlowControlMsg*) msg);
     } else if (msg->getKind() == LISNOC_FLIT) {
         handleMessageFlit((LISNoCFlit*) msg);
+    }
+}
+
+RouterSwitch::~RouterSwitch()
+{
+    for (int p = 0; p < m_nPorts; p++) {
+        for (int v = 0; v < m_nVCs; v++) {
+            cancelEvent(&m_outputRequests[p][v]);
+        }
     }
 }
 

@@ -25,19 +25,23 @@ void NISource::initialize()
 {
     LISNoCBaseModule::initialize();
 
+    m_timerMessage = new cMessage;
+
     m_id = par("id");
-    if (m_id == 0) {
-        triggerSelf(0, &m_timerMessage);
+    if ((int) par("dstId") >= 0) {
+        triggerSelf((int) par("initialdelay"), m_timerMessage);
     }
 }
 
 void NISource::genPacket()
 {
-    int numflits = 3;
+    int numflits = 8;
+    int dstId = par("dstId");
+
     for (int f = 0; f < numflits; f++) {
         LISNoCFlit *flit = new LISNoCFlit();
         flit->setVC(0);
-        flit->setDstId(15);
+        flit->setDstId(dstId);
         flit->setBitLength(32);
         flit->setByteLength(4);
         flit->setFlitId(f);
@@ -48,7 +52,9 @@ void NISource::genPacket()
         m_queue.insert(flit);
     }
 
-    requestTransfer((LISNoCFlit*) m_queue.front());
+    if (canRequestTransfer((LISNoCFlit*) m_queue.front())) {
+        requestTransfer((LISNoCFlit*) m_queue.front());
+    }
 }
 
 void NISource::doTransfer()
@@ -66,10 +72,23 @@ void NISource::doTransfer()
 }
 
 void NISource::handleSelfMessage(cMessage *msg) {
-    ASSERT(msg == &m_timerMessage);
+    ASSERT(msg == m_timerMessage);
 
     genPacket();
-//    triggerSelf(100, &m_timerMessage);
+    triggerSelf((int) par("genDelay"), m_timerMessage);
+}
+
+void NISource::finish()
+{
+    cancelAndDelete(m_timerMessage);
+}
+
+NISource::~NISource() {
+
+    while (!m_queue.empty()) {
+        LISNoCFlit *flit = (LISNoCFlit*) m_queue.pop();
+        delete flit;
+    }
 }
 
 }; // namespace

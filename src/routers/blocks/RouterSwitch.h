@@ -26,6 +26,8 @@ namespace lisnoc {
  */
 class RouterSwitch : public cSimpleModule
 {
+public:
+    virtual ~RouterSwitch();
 private:
     int m_nVCs;
     int m_nPorts;

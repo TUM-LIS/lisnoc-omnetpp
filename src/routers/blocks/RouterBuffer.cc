@@ -86,5 +86,9 @@ bool RouterBuffer::isRequestGranted(LISNoCFlowControlMsg *msg)
     return (m_buffer.getLength() < m_maxfill);
 }
 
+RouterBuffer::~RouterBuffer()
+{
+    cancelEvent(&m_timerMsg);
+}
 
 } //namespace
