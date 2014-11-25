@@ -29,6 +29,8 @@ private:
     cMessage m_selfTrigger;
     simtime_t m_clock;
 
+    bool m_isInitialized = false;
+
     std::pair<bool, simtime_t> m_pendingRequestWithLateAck;
 protected:
     virtual void initialize();

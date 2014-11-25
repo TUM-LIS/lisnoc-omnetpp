@@ -23,6 +23,8 @@ Define_Module(Source);
 
 void Source::initialize()
 {
+    LISNoCBaseModule::initialize();
+
     m_id = par("id");
     if (m_id == 0) {
         triggerSelf(0, &m_timerMessage);

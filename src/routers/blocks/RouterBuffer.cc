@@ -21,6 +21,8 @@ Define_Module(RouterBuffer);
 
 void RouterBuffer::initialize()
 {
+    LISNoCBaseModule::initialize();
+
     // TODO: parameter
     m_maxfill = 4;
 

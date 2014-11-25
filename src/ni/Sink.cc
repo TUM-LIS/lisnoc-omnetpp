@@ -21,7 +21,7 @@ Define_Module(Sink);
 
 void Sink::initialize()
 {
-
+    LISNoCBaseModule::initialize();
 }
 
 void Sink::handleIncomingFlit(LISNoCFlit *msg)

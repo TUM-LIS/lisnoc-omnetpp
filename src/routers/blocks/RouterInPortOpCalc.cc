@@ -24,11 +24,12 @@ Define_Module(RouterInPortOpCalc);
 
 void RouterInPortOpCalc::initialize()
 {
+    LISNoCBaseModule::initialize();
+
     m_storedFlit = NULL;
 
     // Todo: static XY selection for now
     m_routingFunction = new RoutingFunctionMeshXY(4, par("routerId"));
-
 }
 
 bool RouterInPortOpCalc::isRequestGranted(LISNoCFlowControlMsg *msg)

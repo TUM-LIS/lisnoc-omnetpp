@@ -23,6 +23,8 @@ void LISNoCBaseModule::initialize() {
     m_clock = simtime_t(2, SIMTIME_NS);
 
     m_pendingRequestWithLateAck.first = false;
+
+    m_isInitialized = true;
 }
 
 void LISNoCBaseModule::allowLateAck() {
@@ -54,6 +56,7 @@ void LISNoCBaseModule::requestTransfer(LISNoCFlit *msg) {
 }
 
 void LISNoCBaseModule::requestTransferAfter(LISNoCFlit *msg, unsigned int numcycles) {
+    ASSERT(m_isInitialized);
     ASSERT(m_flowControlMsg.isScheduled() == false);
 
     if (msg) {
@@ -83,6 +86,7 @@ void LISNoCBaseModule::handleMessage(cMessage *msg)
 
 void LISNoCBaseModule::triggerSelf(unsigned int numcycles, cMessage *msg)
 {
+    ASSERT(m_isInitialized);
     if (!msg) {
         msg = &m_selfTrigger;
     }
