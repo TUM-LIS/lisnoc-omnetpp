@@ -18,6 +18,7 @@ package lisnoc.routers.buffered;
 import lisnoc.routers.blocks.RouterInPort;
 import lisnoc.routers.blocks.RouterOutPort;
 import lisnoc.routers.blocks.RouterSwitch;
+import lisnoc.routers.blocks.RouterStatisticsUnit;
 
 module RouterBuffered
 {
@@ -52,6 +53,7 @@ module RouterBuffered
    		 	    nPorts = nPorts;
    		 	    nVCs = nVCs;   
    		}
+   		statisticsUnit: RouterStatisticsUnit;
    		
    	connections:
 	    for p=0..(nPorts-1), for vc=0..(nVCs-1) {
