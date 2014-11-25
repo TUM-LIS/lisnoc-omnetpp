@@ -27,11 +27,12 @@ void Sink::initialize()
 void Sink::handleIncomingFlit(LISNoCFlit *msg)
 {
     std::cout << "[" << simTime() << "," << getFullPath() << "] Received flit" << std::endl;
+    delete(msg);
 }
 
 bool Sink::isRequestGranted(LISNoCFlowControlMsg *msg)
 {
-   return true;
+    return true;
 }
 
 }; // namespace
