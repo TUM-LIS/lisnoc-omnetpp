@@ -45,6 +45,7 @@ void RouterInPortOpCalc::handleIncomingFlit(LISNoCFlit *msg)
     // do routing
     m_routingFunction->doRouting(msg);
 
+    triggerSelf(1);
 }
 
 void RouterInPortOpCalc::handleSelfMessage(cMessage *msg)
