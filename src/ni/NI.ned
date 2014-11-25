@@ -23,6 +23,7 @@ module NI
     parameters:
         int id;
         int nVCs;
+        int numNIs;
 
         @display("i=device/cpu");
 

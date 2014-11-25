@@ -40,7 +40,8 @@ network MeshBuffered {
 	    ni[columns*rows]: NI {
 	     	parameters:
 	     	    nVCs = nVCs;
-	     	    id = index;   
+	     	    numNIs = columns*rows; 
+	     	    id = index;
 	        @display("p=50,50,m,$columns,100,100");
 	    }
 	    
