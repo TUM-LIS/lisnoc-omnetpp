@@ -42,6 +42,7 @@ void RouterBuffer::handleIncomingFlit(LISNoCFlit *msg)
     ASSERT(m_buffer.getLength() < m_maxfill);
 
     m_buffer.insert(msg);
+    cancelEvent(&m_timerMsg);
     triggerSelf(1, &m_timerMsg);
 }
 
@@ -66,6 +67,7 @@ void RouterBuffer::doTransfer()
     sendDelayed((cMessage*) m_buffer.pop(), SIMTIME_ZERO, "out");
 
     if (m_buffer.getLength() >= 1) {
+        cancelEvent(&m_timerMsg);
         triggerSelf(1, &m_timerMsg);
     }
 }

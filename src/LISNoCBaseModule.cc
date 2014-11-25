@@ -95,6 +95,8 @@ void LISNoCBaseModule::triggerSelf(unsigned int numcycles, cMessage *msg)
         msg = &m_selfTrigger;
     }
 
+    ASSERT(!msg->isScheduled());
+
     simtime_t curtime = simTime();
     ASSERT((curtime.remainderForUnit(SIMTIME_NS) == 0) &&
             (curtime.inUnit(SIMTIME_NS) % 2 == 0));
@@ -113,6 +115,11 @@ void LISNoCBaseModule::handleIncomingGrant(LISNoCFlowControlMsg *msg)
     if (msg != &m_flowControlMsg) {
         // late grant
         ASSERT(m_allowLateAck);
+
+        ASSERT(m_flowControlMsg.isScheduled());
+
+        cancelEvent(&m_flowControlMsg);
+
         delete(msg);
     }
 
