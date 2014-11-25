@@ -82,6 +82,7 @@ void LISNoCBaseModule::triggerSelf(unsigned int numcycles, cMessage *msg)
 void LISNoCBaseModule::handleIncomingGrant(LISNoCFlowControlMsg *msg)
 {
     if (!msg->getAck()) {
+        requestTransferAfter(1);
         return;
     }
 
