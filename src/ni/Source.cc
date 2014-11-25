@@ -39,7 +39,7 @@ void Source::genPacket()
         m_queue.insert(flit);
     }
 
-    requestTransfer();
+    requestTransfer((LISNoCFlit*) m_queue.front());
 }
 
 void Source::doTransfer()
@@ -49,7 +49,7 @@ void Source::doTransfer()
     sendDelayed((cMessage*)m_queue.pop(), SIMTIME_ZERO, "out", 0);
 
     if (m_queue.getLength() > 0) {
-        requestTransferAfter(1);
+        requestTransferAfter((LISNoCFlit*) m_queue.front(), 1);
     }
 
 }

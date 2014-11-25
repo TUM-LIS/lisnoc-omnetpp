@@ -33,7 +33,9 @@ packet LISNoCFlit {
 packet LISNoCFlowControlMsg {
     bool ack; // In Grant
     bool allowLateAck; // In Request
-	bool isLateAck; // In Grant    
-    int VC; // In Request
-    int outputPort; // In Request
+	bool isLateAck; // In Grant
+	
+	// Include control information from actual flit
+	int VC;
+	int outputPort;
 }

@@ -33,9 +33,14 @@ void LISNoCBaseModule::allowLateAck() {
     m_flowControlMsg.setAllowLateAck(true);
 }
 
-void LISNoCBaseModule::requestTransfer() {
+void LISNoCBaseModule::requestTransfer(LISNoCFlit *msg) {
     m_flowControlMsg.setKind(LISNOC_REQUEST);
     m_flowControlMsg.setAck(false);
+
+    if (msg) {
+        m_flowControlMsg.setVC(msg->getVC());
+        m_flowControlMsg.setOutputPort(msg->getOutputPort());
+    }
 
     if (hasGate("fc_req_out", 0)) {
         send(&m_flowControlMsg, "fc_req_out", 0);
@@ -44,8 +49,14 @@ void LISNoCBaseModule::requestTransfer() {
     }
 }
 
-void LISNoCBaseModule::requestTransferAfter(unsigned int numcycles) {
+void LISNoCBaseModule::requestTransferAfter(LISNoCFlit *msg, unsigned int numcycles) {
     ASSERT(m_flowControlMsg.isScheduled() == false);
+
+    if (msg) {
+        m_flowControlMsg.setVC(msg->getVC());
+        m_flowControlMsg.setOutputPort(msg->getOutputPort());
+    }
+
     scheduleAt(simTime() + m_clock * numcycles, &m_flowControlMsg);
 }
 
@@ -53,7 +64,7 @@ void LISNoCBaseModule::handleMessage(cMessage *msg)
 {
     if (msg->isSelfMessage()) {
         if (msg == &m_flowControlMsg) {
-            requestTransfer();
+            requestTransfer(NULL);
         } else {
             handleSelfMessage(msg);
         }
@@ -82,7 +93,7 @@ void LISNoCBaseModule::triggerSelf(unsigned int numcycles, cMessage *msg)
 void LISNoCBaseModule::handleIncomingGrant(LISNoCFlowControlMsg *msg)
 {
     if (!msg->getAck()) {
-        requestTransferAfter(1);
+        requestTransferAfter(NULL, 1);
         return;
     }
 

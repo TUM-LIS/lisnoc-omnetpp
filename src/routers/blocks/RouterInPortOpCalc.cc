@@ -55,7 +55,7 @@ void RouterInPortOpCalc::handleSelfMessage(cMessage *msg)
 void RouterInPortOpCalc::trySend() {
     ASSERT(m_storedFlit != NULL);
 
-    requestTransfer();
+    requestTransfer(m_storedFlit);
 }
 
 void RouterInPortOpCalc::doTransfer()

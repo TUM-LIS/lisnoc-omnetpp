@@ -44,8 +44,8 @@ protected:
     virtual void triggerSelf(unsigned int numcycles = 1, cMessage *msg = NULL);
     virtual void handleSelfMessage(cMessage *msg) = 0;
 
-    virtual void requestTransfer();
-    virtual void requestTransferAfter(unsigned int numcycles = 0);
+    virtual void requestTransfer(LISNoCFlit *msg);
+    virtual void requestTransferAfter(LISNoCFlit *msg, unsigned int numcycles);
     virtual void doTransfer() = 0;
 
     virtual bool isRequestGranted(LISNoCFlowControlMsg *msg) = 0;

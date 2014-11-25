@@ -41,7 +41,7 @@ void RouterBuffer::trySend()
 {
     ASSERT(m_buffer.getLength() >= 1);
 
-    requestTransfer();
+    requestTransfer((LISNoCFlit*) m_buffer.front());
 }
 
 void RouterBuffer::handleSelfMessage(cMessage *msg)
