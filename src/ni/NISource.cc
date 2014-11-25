@@ -78,17 +78,13 @@ void NISource::handleSelfMessage(cMessage *msg) {
     triggerSelf((int) par("genDelay"), m_timerMessage);
 }
 
-void NISource::finish()
-{
-    cancelAndDelete(m_timerMessage);
-}
-
 NISource::~NISource() {
 
     while (!m_queue.empty()) {
         LISNoCFlit *flit = (LISNoCFlit*) m_queue.pop();
         delete flit;
     }
+    cancelAndDelete(m_timerMessage);
 }
 
 }; // namespace

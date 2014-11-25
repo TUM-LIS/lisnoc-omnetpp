@@ -30,7 +30,6 @@ class NISource : public LISNoCBaseModule
 {
 protected:
     virtual ~NISource();
-    virtual void finish();
   private:
     int m_id;
     cMessage *m_timerMessage;
