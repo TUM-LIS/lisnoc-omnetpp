@@ -27,6 +27,7 @@ void LISNoCBaseModule::initialize() {
 
     m_flowControlMsg = new LISNoCFlowControlMsg;
     m_flowControlMsg->setAllowLateAck(false);
+    m_incomingFlowControlMsg = NULL;
 
     m_selfTrigger = new cMessage;
 }
@@ -141,6 +142,8 @@ void LISNoCBaseModule::handleIncomingRequest(LISNoCFlowControlMsg *msg)
         m_pendingRequestWithLateAck.first = false;
     }
 
+    m_incomingFlowControlMsg = msg;
+
     if (hasGate("fc_grant_out", 0)) {
         sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out", 0);
     } else {
@@ -167,13 +170,24 @@ void LISNoCBaseModule::tryLateGrant() {
 
 void LISNoCBaseModule::finish()
 {
-    cancelEvent(m_flowControlMsg);
+    if (m_incomingFlowControlMsg &&
+            (m_incomingFlowControlMsg->getOwner() != this)) {
+        m_incomingFlowControlMsg = NULL;
+    }
+
+    if (m_flowControlMsg->getOwner() != this) {
+        m_flowControlMsg = NULL;
+    }
 }
 
 LISNoCBaseModule::~LISNoCBaseModule()
 {
     cancelAndDelete(m_selfTrigger);
+
+    // Delete messages (not necessary to check if nullptr)
+    delete m_incomingFlowControlMsg;
     delete m_flowControlMsg;
+
 }
 
 } /* namespace lisnoc */

@@ -29,6 +29,7 @@ public:
 private:
     bool m_allowLateAck;
     LISNoCFlowControlMsg *m_flowControlMsg;
+    LISNoCFlowControlMsg *m_incomingFlowControlMsg;
     cMessage *m_selfTrigger;
     simtime_t m_clock;
 
