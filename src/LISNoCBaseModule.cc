@@ -17,15 +17,12 @@
 
 namespace lisnoc {
 
-LISNoCBaseModule::LISNoCBaseModule() {
+void LISNoCBaseModule::initialize() {
     m_allowLateAck = false;
+    m_flowControlMsg.setAllowLateAck(false);
     m_clock = simtime_t(2, SIMTIME_NS);
 
     m_pendingRequestWithLateAck.first = false;
-}
-
-LISNoCBaseModule::~LISNoCBaseModule() {
-    // TODO Auto-generated destructor stub
 }
 
 void LISNoCBaseModule::allowLateAck() {
@@ -33,7 +30,14 @@ void LISNoCBaseModule::allowLateAck() {
     m_flowControlMsg.setAllowLateAck(true);
 }
 
+bool LISNoCBaseModule::canRequestTransfer(LISNoCFlit *msg)
+{
+    return (m_flowControlMsg.isScheduled() == false);
+}
+
 void LISNoCBaseModule::requestTransfer(LISNoCFlit *msg) {
+    ASSERT(m_flowControlMsg.isScheduled() == false);
+
     m_flowControlMsg.setKind(LISNOC_REQUEST);
     m_flowControlMsg.setAck(false);
 
@@ -93,8 +97,15 @@ void LISNoCBaseModule::triggerSelf(unsigned int numcycles, cMessage *msg)
 void LISNoCBaseModule::handleIncomingGrant(LISNoCFlowControlMsg *msg)
 {
     if (!msg->getAck()) {
+        ASSERT(msg == &m_flowControlMsg); // not allowed for late ack
         requestTransferAfter(NULL, 1);
         return;
+    }
+
+    if (msg != &m_flowControlMsg) {
+        // late grant
+        ASSERT(m_allowLateAck);
+        delete(msg);
     }
 
     doTransfer();

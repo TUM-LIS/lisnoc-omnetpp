@@ -24,7 +24,7 @@ void RouterBuffer::initialize()
     // TODO: parameter
     m_maxfill = 4;
 
-    allowLateAck();
+    //allowLateAck();
 }
 
 void RouterBuffer::handleIncomingFlit(LISNoCFlit *msg)
@@ -39,7 +39,9 @@ void RouterBuffer::trySend()
 {
     ASSERT(m_buffer.getLength() >= 1);
 
-    requestTransfer((LISNoCFlit*) m_buffer.front());
+    if (canRequestTransfer((LISNoCFlit*) m_buffer.front())) {
+        requestTransfer((LISNoCFlit*) m_buffer.front());
+    }
 }
 
 void RouterBuffer::handleSelfMessage(cMessage *msg)

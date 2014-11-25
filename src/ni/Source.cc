@@ -31,7 +31,7 @@ void Source::initialize()
 
 void Source::genPacket()
 {
-    for (int f = 0; f < 8; f++) {
+    for (int f = 0; f < 3; f++) {
         LISNoCFlit *flit = new LISNoCFlit();
         flit->setVC(0);
         flit->setDstId(15);

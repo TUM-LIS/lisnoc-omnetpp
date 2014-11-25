@@ -23,9 +23,6 @@
 namespace lisnoc {
 
 class LISNoCBaseModule: public cSimpleModule {
-public:
-    LISNoCBaseModule();
-    virtual ~LISNoCBaseModule();
 private:
     bool m_allowLateAck;
     LISNoCFlowControlMsg m_flowControlMsg;
@@ -34,6 +31,7 @@ private:
 
     std::pair<bool, simtime_t> m_pendingRequestWithLateAck;
 protected:
+    virtual void initialize();
     virtual void allowLateAck();
 
     virtual void handleMessage(cMessage *msg);
@@ -44,6 +42,7 @@ protected:
     virtual void triggerSelf(unsigned int numcycles = 1, cMessage *msg = NULL);
     virtual void handleSelfMessage(cMessage *msg) = 0;
 
+    virtual bool canRequestTransfer(LISNoCFlit *msg);
     virtual void requestTransfer(LISNoCFlit *msg);
     virtual void requestTransferAfter(LISNoCFlit *msg, unsigned int numcycles);
     virtual void doTransfer() = 0;

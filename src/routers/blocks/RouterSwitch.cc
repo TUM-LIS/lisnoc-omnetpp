@@ -123,7 +123,6 @@ void RouterSwitch::handleMessageGrant(LISNoCFlowControlMsg *msg)
 
     ASSERT(&m_outputRequests[port][vc] == msg);
 
-    std::cout << "Grant output " << port << ":" << vc << " is " << msg->getAck() << std::endl;
     m_outputArbiters[port][vc]->setOutputReady(msg->getAck());
 
     if (m_selfSignal.isScheduled()) {
