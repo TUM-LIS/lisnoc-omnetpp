@@ -48,14 +48,14 @@ namespace lisnoc {
     std::pair<LISNoCFlowControlRequest*, simtime_t> m_pendingRequestWithLateAck;
     
     bool m_isInitialized;
-  protected:
-    virtual void initialize();
-    virtual void allowLateAck();
-    
+
     virtual LISNoCFlowControlRequest *createFlowControlRequest(LISNoCFlit *flit);
     virtual LISNoCFlowControlRequest *createFlowControlRequest(LISNoCFlowControlGrant *grant);
     virtual LISNoCFlowControlGrant *createFlowControlGrant(LISNoCFlowControlRequest *request);
 
+  protected:
+    virtual void initialize();
+    virtual void allowLateAck();
 
     virtual void handleMessage(cMessage *msg);
     virtual void handleIncomingRequest(LISNoCFlowControlRequest *msg);
