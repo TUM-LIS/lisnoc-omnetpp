@@ -181,12 +181,12 @@ void LISNoCBaseModule::handleIncomingRequest(LISNoCFlowControlRequest *request)
 {
     bool ack = isRequestGranted(request);
 
+    delete m_pendingRequestWithLateAck.first;
+    m_pendingRequestWithLateAck.first = NULL;
+
     if (!ack && request->getAllowLateAck()) {
         m_pendingRequestWithLateAck.first = request;
         m_pendingRequestWithLateAck.second = simTime();
-    } else {
-        delete m_pendingRequestWithLateAck.first;
-        m_pendingRequestWithLateAck.first = NULL;
     }
 
     LISNoCFlowControlGrant *grant = createFlowControlGrant(request);
@@ -198,7 +198,7 @@ void LISNoCBaseModule::handleIncomingRequest(LISNoCFlowControlRequest *request)
         sendDelayed(grant, SIMTIME_ZERO, "fc_grant_out");
     }
 
-    if (ack || !request->getAllowLateAck()) {
+    if (!(!ack && request->getAllowLateAck())) {
         delete request;
     }
 }
@@ -217,7 +217,7 @@ void LISNoCBaseModule::tryLateGrant() {
             sendDelayed(grant, SIMTIME_ZERO, "fc_grant_out");
         }
 
-        delete request;
+        delete m_pendingRequestWithLateAck.first;
         m_pendingRequestWithLateAck.first = NULL;
     }
 }
