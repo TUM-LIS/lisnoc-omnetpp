@@ -138,7 +138,7 @@ bool RouterSwitch::Arbiter::getOutputReady()
 
 void RouterSwitch::handleMessageRequest(LISNoCFlowControlRequest *request)
 {
-    LISNoCFlitControlInfo *controlInfo = (LISNoCFlitControlInfo*) request->getControlInfo();
+    LISNoCFlitControlInfo *controlInfo = (LISNoCFlitControlInfo*) request->getControlInfo()->dup();
     int outport = controlInfo->getOutputPort();
     int outvc = controlInfo->getVC();
 
@@ -155,7 +155,7 @@ void RouterSwitch::handleMessageRequest(LISNoCFlowControlRequest *request)
     LISNoCFlowControlRequest *fwdrequest = m_outputRequests[outport][outvc];
     if (!fwdrequest) {
         fwdrequest = new LISNoCFlowControlRequest;
-        fwdrequest->setControlInfo(request->getControlInfo());
+        fwdrequest->setControlInfo(request->getControlInfo()->dup());
         send(fwdrequest, "fc_req_out", outport*m_nVCs+outvc);
     }
 
