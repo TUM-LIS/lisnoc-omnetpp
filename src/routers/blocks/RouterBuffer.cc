@@ -88,6 +88,7 @@ bool RouterBuffer::isRequestGranted(LISNoCFlowControlRequest *msg)
 
 void RouterBuffer::finish() {
     cancelEvent(&m_timerMsg);
+    LISNoCBaseModule::finish();
 }
 
 RouterBuffer::~RouterBuffer()
