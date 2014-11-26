@@ -31,7 +31,7 @@ namespace lisnoc {
     public:
         LISNoCFlowControlRequest(const char *name=NULL, int kind=0) : LISNoCFlowControlRequest_Base(name,LISNOC_REQUEST) {}
         LISNoCFlowControlRequest(const LISNoCFlowControlRequest& other) : LISNoCFlowControlRequest_Base(other) {copy(other);}
-        ~LISNoCFlowControlRequest() { if (getControlInfo()) removeControlInfo(); }
+        ~LISNoCFlowControlRequest() {  }
         LISNoCFlowControlRequest& operator=(const LISNoCFlowControlRequest& other) {if (this==&other) return *this; LISNoCFlowControlRequest_Base::operator=(other); copy(other); return *this;}
         virtual LISNoCFlowControlRequest *dup() const {return new LISNoCFlowControlRequest(*this);}
     };
@@ -43,7 +43,7 @@ namespace lisnoc {
     public:
         LISNoCFlowControlGrant(const char *name=NULL, int kind=0) : LISNoCFlowControlGrant_Base(name,LISNOC_GRANT) {}
         LISNoCFlowControlGrant(const LISNoCFlowControlGrant& other) : LISNoCFlowControlGrant_Base(other) {copy(other);}
-        ~LISNoCFlowControlGrant() { if (getControlInfo()) removeControlInfo(); }
+        ~LISNoCFlowControlGrant() {  }
         LISNoCFlowControlGrant& operator=(const LISNoCFlowControlGrant& other) {if (this==&other) return *this; LISNoCFlowControlGrant_Base::operator=(other); copy(other); return *this;}
         virtual LISNoCFlowControlGrant *dup() const {return new LISNoCFlowControlGrant(*this);}
     };
