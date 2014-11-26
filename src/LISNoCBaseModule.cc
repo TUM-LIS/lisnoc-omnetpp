@@ -69,6 +69,7 @@ LISNoCFlowControlRequest *LISNoCBaseModule::createFlowControlRequest(LISNoCFlowC
 {
     ASSERT(grant);
     LISNoCFlowControlRequest *msg = new LISNoCFlowControlRequest;
+    msg->setAllowLateAck(m_allowLateAck);
 
     if (grant) {
         msg->setControlInfo(grant->getControlInfo()->dup());
