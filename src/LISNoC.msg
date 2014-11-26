@@ -21,30 +21,31 @@ enum LISNoC_Message {
 	LISNOC_GRANT = 2;
 }
 
-packet LISNoCFlit {
-    int packetId;
-	int srcId;
-  	int dstId;
-  	int VC;
-  	int outputPort;
-  	uint8_t data[];
-  	int flitId;
-  	int isHead;
-  	int isTail;
-  	simtime_t generationTime;
-  	simtime_t sendTime;
-}
-
-packet LISNoCFlowControlMsg {
-    bool ack; // In Grant
-    bool allowLateAck; // In Request
-	bool isLateAck; // In Grant
-	
-	// Include control information from actual flit
+class LISNoCFlitControlInfo {
 	int VC;
 	int outputPort;
     int packetId;
   	int flitId;
 	bool isHead;
-	bool isTail;
+	bool isTail;    
+	int srcId;
+  	int dstId;
+};
+
+packet LISNoCFlit {
+    @customize(true);
+  	uint8_t data[];
+  	simtime_t generationTime;
+  	simtime_t sendTime;
 }
+
+packet LISNoCFlowControlRequest {
+	@customize(true);
+    bool allowLateAck = false;
+}
+
+packet LISNoCFlowControlGrant {
+    @customize(true);
+    bool ack = false;
+	bool isLateAck = false;
+}	
