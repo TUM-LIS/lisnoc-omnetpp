@@ -42,7 +42,7 @@ private:
     virtual void handleIncomingFlit(LISNoCFlit *msg);
     virtual void trySend();
     virtual void doTransfer();
-    virtual bool isRequestGranted(LISNoCFlowControlMsg *msg);
+    virtual bool isRequestGranted(LISNoCFlowControlRequest *msg);
 };
 
 } //namespace

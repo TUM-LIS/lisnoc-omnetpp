@@ -50,7 +50,7 @@ void NISink::handleIncomingFlit(LISNoCFlit *msg)
     delete(msg);
 }
 
-bool NISink::isRequestGranted(LISNoCFlowControlMsg *msg)
+bool NISink::isRequestGranted(LISNoCFlowControlRequest *msg)
 {
     return true;
 }

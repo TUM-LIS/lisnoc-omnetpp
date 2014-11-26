@@ -81,14 +81,17 @@ void RouterBuffer::doTransfer()
     }
 }
 
-bool RouterBuffer::isRequestGranted(LISNoCFlowControlMsg *msg)
+bool RouterBuffer::isRequestGranted(LISNoCFlowControlRequest *msg)
 {
     return (m_buffer.getLength() < m_maxfill);
 }
 
+void RouterBuffer::finish() {
+    cancelEvent(&m_timerMsg);
+}
+
 RouterBuffer::~RouterBuffer()
 {
-    cancelEvent(&m_timerMsg);
 }
 
 } //namespace

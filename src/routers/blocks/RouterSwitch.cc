@@ -29,14 +29,12 @@ void RouterSwitch::initialize()
     m_inputRequests.resize(m_nPorts);
     for (int p = 0; p < m_nPorts; p++) {
         m_outputArbiters[p].resize(m_nVCs);
-        m_outputRequests[p].resize(m_nVCs);
-        m_inputRequests[p].resize(m_nVCs);
+        m_inputRequests[p].resize(m_nVCs, NULL);
+        m_outputRequests[p].resize(m_nVCs, NULL);
 
         for (int v = 0; v < m_nVCs; v++) {
             Arbiter *arb = new Arbiter(m_nPorts, p, v);
             m_outputArbiters[p][v] = arb;
-
-            m_inputRequests[p][v] = NULL;
         }
     }
 
@@ -138,44 +136,47 @@ bool RouterSwitch::Arbiter::getOutputReady()
     return m_outputReady;
 }
 
-void RouterSwitch::handleMessageRequest(LISNoCFlowControlMsg *msg)
+void RouterSwitch::handleMessageRequest(LISNoCFlowControlRequest *request)
 {
-    int outport = msg->getOutputPort();
-    int outvc = msg->getVC();
+    LISNoCFlitControlInfo *controlInfo = (LISNoCFlitControlInfo*) request->getControlInfo();
+    int outport = controlInfo->getOutputPort();
+    int outvc = controlInfo->getVC();
 
     Arbiter *arb = m_outputArbiters[outport][outvc];
-    LISNoCFlowControlMsg *omsg = &m_outputRequests[outport][outvc];
 
-    int gateidx = msg->getArrivalGate()->getIndex();
+    int gateidx = request->getArrivalGate()->getIndex();
     int inport = gateidx / m_nVCs;
     int invc = gateidx % m_nVCs;
 
-    arb->request(inport, invc, msg->getIsHead(), msg->getIsTail());
-    ASSERT(m_inputRequests[inport][invc] == NULL);
-    m_inputRequests[inport][invc] = msg;
+    arb->request(inport, invc, controlInfo->getIsHead(), controlInfo->getIsTail());
+    ASSERT(!m_inputRequests[inport][invc]);
+    m_inputRequests[inport][invc] = controlInfo;
 
-    if (!omsg->isScheduled()) {
-        omsg->setKind(LISNOC_REQUEST);
-        send(omsg, "fc_req_out", outport*m_nVCs+outvc);
+    LISNoCFlowControlRequest *fwdrequest = m_outputRequests[outport][outvc];
+    if (!fwdrequest) {
+        fwdrequest = new LISNoCFlowControlRequest;
+        fwdrequest->setControlInfo(request->getControlInfo());
+        send(fwdrequest, "fc_req_out", outport*m_nVCs+outvc);
     }
 
+    delete request;
 }
 
-void RouterSwitch::handleMessageGrant(LISNoCFlowControlMsg *msg)
+void RouterSwitch::handleMessageGrant(LISNoCFlowControlGrant *grant)
 {
-    int gateidx = msg->getArrivalGate()->getIndex();
+    int gateidx = grant->getArrivalGate()->getIndex();
     int port = gateidx / m_nVCs;
     int vc = gateidx % m_nVCs;
 
-    ASSERT(&m_outputRequests[port][vc] == msg);
-
-    m_outputArbiters[port][vc]->setOutputReady(msg->getAck());
+    m_outputArbiters[port][vc]->setOutputReady(grant->getAck());
 
     if (m_selfSignal->isScheduled()) {
         cancelEvent(m_selfSignal);
     }
 
     scheduleAt(simTime(), m_selfSignal);
+
+    delete grant;
 }
 
 void RouterSwitch::arbitrate()
@@ -193,23 +194,22 @@ void RouterSwitch::arbitrate()
             int inport = m_outputArbiters[p][v]->arbitrate();
             ASSERT(inport >= 0);
 
-            LISNoCFlowControlMsg *msg = m_inputRequests[inport][v];
-            ASSERT(msg);
-            msg->setKind(LISNOC_GRANT);
-            msg->setAck(true);
-            sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out", inport*m_nVCs+v);
+            ASSERT(m_inputRequests[inport][v]);
+            LISNoCFlowControlGrant *grant = new LISNoCFlowControlGrant;
+            grant->setControlInfo(m_inputRequests[inport][v]);
+            grant->setAck(true);
+            sendDelayed(grant, SIMTIME_ZERO, "fc_grant_out", inport*m_nVCs+v);
+            m_inputRequests[inport][v] = NULL;
         }
     }
 
     for (int p = 0; p < m_nPorts; p++) {
         for (int v = 0; v < m_nVCs; v++) {
-            LISNoCFlowControlMsg *msg = m_inputRequests[p][v];
-            if (msg) {
-                if (!msg->isScheduled()) {
-                    msg->setKind(LISNOC_GRANT);
-                    msg->setAck(false);
-                    sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out", p*m_nVCs+v);
-                }
+            if (m_inputRequests[p][v]) {
+                LISNoCFlowControlGrant *grant = new LISNoCFlowControlGrant;
+                grant->setControlInfo(m_inputRequests[p][v]);
+                grant->setAck(false);
+                sendDelayed(grant, SIMTIME_ZERO, "fc_grant_out", p*m_nVCs+v);
                 m_inputRequests[p][v] = NULL;
             }
         }
@@ -218,8 +218,9 @@ void RouterSwitch::arbitrate()
 
 void RouterSwitch::handleMessageFlit(LISNoCFlit *msg)
 {
-    int oport = msg->getOutputPort();
-    int ovc = msg->getVC();
+    LISNoCFlitControlInfo *controlInfo = (LISNoCFlitControlInfo*) msg->getControlInfo();
+    int oport = controlInfo->getOutputPort();
+    int ovc = controlInfo->getVC();
 
     send(msg, "out", oport*m_nVCs+ovc);
 }
@@ -229,9 +230,9 @@ void RouterSwitch::handleMessage(cMessage *msg)
     if (msg->isSelfMessage()) {
         arbitrate();
     } else if (msg->getKind() == LISNOC_REQUEST) {
-        handleMessageRequest((LISNoCFlowControlMsg*) msg);
+        handleMessageRequest((LISNoCFlowControlRequest*) msg);
     } else if (msg->getKind() == LISNOC_GRANT) {
-        handleMessageGrant((LISNoCFlowControlMsg*) msg);
+        handleMessageGrant((LISNoCFlowControlGrant*) msg);
     } else if (msg->getKind() == LISNOC_FLIT) {
         handleMessageFlit((LISNoCFlit*) msg);
     }
@@ -239,11 +240,11 @@ void RouterSwitch::handleMessage(cMessage *msg)
 
 RouterSwitch::~RouterSwitch()
 {
-    /*for (int p = 0; p < m_nPorts; p++) {
+    for (int p = 0; p < m_nPorts; p++) {
         for (int v = 0; v < m_nVCs; v++) {
-            cancelEvent(&m_outputRequests[p][v]);
+            delete m_outputRequests[p][v];
         }
-    }*/
+    }
 
     delete m_selfSignal;
 }

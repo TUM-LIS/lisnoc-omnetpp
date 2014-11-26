@@ -6,7 +6,7 @@
  */
 
 #include "RoutingFunctionMeshXY.h"
-#include <LISNoC_m.h>
+#include <LISNoCMessages.h>
 
 namespace lisnoc {
 
@@ -18,8 +18,8 @@ RoutingFunctionMeshXY::RoutingFunctionMeshXY(int columns, int routerId)
 }
 
 void RoutingFunctionMeshXY::doRouting(LISNoCFlit *flit) {
-
-    int dstId = flit->getDstId();
+    LISNoCFlitControlInfo *controlInfo = (LISNoCFlitControlInfo *) flit->getControlInfo();
+    int dstId = controlInfo->getDstId();
     int dstPosX = dstId%m_columns;
     int dstPosY = dstId/m_columns;
 
@@ -37,7 +37,7 @@ void RoutingFunctionMeshXY::doRouting(LISNoCFlit *flit) {
         outputPort = 0; // LOCAL
     }
 
-    flit->setOutputPort(outputPort);
+    controlInfo->setOutputPort(outputPort);
 }
 
 }

@@ -43,6 +43,7 @@ private:
     int m_portId;
     int m_vcId;
   protected:
+    virtual void finish();
     virtual int numInitStages() const { return 2; }
     virtual void initialize(int stage);
     virtual void handleSelfMessage(cMessage *msg);
@@ -50,7 +51,7 @@ private:
     virtual void trySend();
 
     virtual void doTransfer();
-    virtual bool isRequestGranted(LISNoCFlowControlMsg *msg);
+    virtual bool isRequestGranted(LISNoCFlowControlRequest *msg);
 };
 
 } //namespace

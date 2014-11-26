@@ -40,7 +40,7 @@ protected:
     virtual void genPacket();
     virtual void handleSelfMessage(cMessage *msg);
     virtual void doTransfer();
-    virtual bool isRequestGranted(LISNoCFlowControlMsg *msg) { return false; }
+    virtual bool isRequestGranted(LISNoCFlowControlRequest *msg) { return false; }
     virtual void handleIncomingFlit(LISNoCFlit *msg) { }
 
 };

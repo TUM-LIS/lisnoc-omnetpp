@@ -32,7 +32,7 @@ void RouterInPortOpCalc::initialize()
     m_routingFunction = new RoutingFunctionMeshXY(4, par("routerId"));
 }
 
-bool RouterInPortOpCalc::isRequestGranted(LISNoCFlowControlMsg *msg)
+bool RouterInPortOpCalc::isRequestGranted(LISNoCFlowControlRequest *msg)
 {
     return (m_storedFlit == NULL);
 }

@@ -21,75 +21,114 @@ void LISNoCBaseModule::initialize() {
     m_allowLateAck = false;
     m_clock = simtime_t(1, SIMTIME_NS);
 
-    m_pendingRequestWithLateAck.first = false;
+    m_pendingRequestWithLateAck.first = NULL;
 
     m_isInitialized = true;
 
-    m_flowControlMsg = new LISNoCFlowControlMsg;
-    m_flowControlMsg->setAllowLateAck(false);
-    m_incomingFlowControlMsg = NULL;
+    m_activeRequest = false;
 
     m_selfTrigger = new cMessage;
+    m_delayedTransfer = NULL;
 }
 
 void LISNoCBaseModule::allowLateAck() {
     m_allowLateAck = true;
-    m_flowControlMsg->setAllowLateAck(true);
 }
 
 bool LISNoCBaseModule::canRequestTransfer(LISNoCFlit *msg)
 {
-    return (m_flowControlMsg->isScheduled() == false);
+    return !m_activeRequest;
 }
 
-void LISNoCBaseModule::requestTransfer(LISNoCFlit *msg) {
-    ASSERT(m_flowControlMsg->isScheduled() == false);
+LISNoCFlowControlRequest *LISNoCBaseModule::createFlowControlRequest(LISNoCFlit *flit)
+{
+    ASSERT(flit);
+    LISNoCFlowControlRequest *msg = new LISNoCFlowControlRequest;
+    msg->setAllowLateAck(m_allowLateAck);
 
-    m_flowControlMsg->setKind(LISNOC_REQUEST);
-    m_flowControlMsg->setAck(false);
-
-    if (msg) {
-        m_flowControlMsg->setVC(msg->getVC());
-        m_flowControlMsg->setOutputPort(msg->getOutputPort());
-        m_flowControlMsg->setPacketId(msg->getPacketId());
-        m_flowControlMsg->setFlitId(msg->getFlitId());
-        m_flowControlMsg->setIsHead(msg->getIsHead());
-        m_flowControlMsg->setIsTail(msg->getIsTail());
+    if (flit) {
+        msg->setControlInfo(flit->getControlInfo()->dup());
     }
+
+    return msg;
+}
+
+LISNoCFlowControlGrant *LISNoCBaseModule::createFlowControlGrant(LISNoCFlowControlRequest *request)
+{
+    ASSERT(request);
+    LISNoCFlowControlGrant *msg = new LISNoCFlowControlGrant;
+
+    if (request) {
+        msg->setControlInfo(request->getControlInfo()->dup());
+    }
+
+    return msg;
+}
+
+LISNoCFlowControlRequest *LISNoCBaseModule::createFlowControlRequest(LISNoCFlowControlGrant *grant)
+{
+    ASSERT(grant);
+    LISNoCFlowControlRequest *msg = new LISNoCFlowControlRequest;
+
+    if (grant) {
+        msg->setControlInfo(grant->getControlInfo()->dup());
+    }
+
+    return msg;
+}
+
+void LISNoCBaseModule::requestTransfer(LISNoCFlit *actualMsg) {
+    ASSERT(canRequestTransfer(actualMsg));
+
+    LISNoCFlowControlRequest *msg = createFlowControlRequest(actualMsg);
 
     if (hasGate("fc_req_out", 0)) {
-        send(m_flowControlMsg, "fc_req_out", 0);
+        send(msg, "fc_req_out", 0);
     } else {
-        send(m_flowControlMsg, "fc_req_out");
+        send(msg, "fc_req_out");
     }
+
+    m_activeRequest = true;
 }
 
-void LISNoCBaseModule::requestTransferAfter(LISNoCFlit *msg, unsigned int numcycles) {
-    ASSERT(m_isInitialized);
-    ASSERT(m_flowControlMsg->isScheduled() == false);
+void LISNoCBaseModule::delayedTransfer() {
+    ASSERT(m_delayedTransfer);
 
-    if (msg) {
-        m_flowControlMsg->setVC(msg->getVC());
-        m_flowControlMsg->setOutputPort(msg->getOutputPort());
+    if (hasGate("fc_req_out", 0)) {
+        send(m_delayedTransfer, "fc_req_out", 0);
+    } else {
+        send(m_delayedTransfer, "fc_req_out");
     }
 
-    scheduleAt(simTime() + m_clock * numcycles, m_flowControlMsg);
+    m_delayedTransfer = NULL;
+}
+
+void LISNoCBaseModule::requestTransferAfter(LISNoCFlit *actualMsg, unsigned int numcycles) {
+    ASSERT(m_isInitialized);
+    ASSERT(canRequestTransfer(actualMsg));
+    ASSERT(!m_delayedTransfer);
+
+    m_delayedTransfer = createFlowControlRequest(actualMsg);
+
+    scheduleAt(simTime() + m_clock * numcycles, m_delayedTransfer);
+
+    m_activeRequest = true;
 }
 
 void LISNoCBaseModule::handleMessage(cMessage *msg)
 {
     if (msg->isSelfMessage()) {
-        if (msg == m_flowControlMsg) {
-            requestTransfer(NULL);
+        if (msg == m_delayedTransfer) {
+            delayedTransfer();
         } else {
             handleSelfMessage(msg);
         }
     } else if (msg->getKind() == LISNOC_FLIT) {
         handleIncomingFlit((LISNoCFlit*) msg);
     } else if (msg->getKind() == LISNOC_REQUEST) {
-        handleIncomingRequest((LISNoCFlowControlMsg*) msg);
+        handleIncomingRequest((LISNoCFlowControlRequest*) msg);
     } else if (msg->getKind() == LISNOC_GRANT) {
-        handleIncomingGrant((LISNoCFlowControlMsg*) msg);
+        handleIncomingGrant((LISNoCFlowControlGrant*) msg);
     }
 }
 
@@ -108,86 +147,93 @@ void LISNoCBaseModule::triggerSelf(unsigned int numcycles, cMessage *msg)
     scheduleAt(curtime + m_clock * numcycles, msg);
 }
 
-void LISNoCBaseModule::handleIncomingGrant(LISNoCFlowControlMsg *msg)
+void LISNoCBaseModule::handleIncomingGrant(LISNoCFlowControlGrant *grant)
 {
-    if (!msg->getAck()) {
-        ASSERT(msg == m_flowControlMsg); // not allowed for late ack
-        requestTransferAfter(NULL, 1);
+    if (!grant->getAck()) {
+        ASSERT(!m_delayedTransfer);
+        m_delayedTransfer = createFlowControlRequest(grant);
+        scheduleAt(simTime() + m_clock, m_delayedTransfer);
+
+        delete grant;
         return;
     }
 
-    if (msg != m_flowControlMsg) {
+    if (grant->getIsLateAck()) {
         // late grant
         ASSERT(m_allowLateAck);
 
-        ASSERT(m_flowControlMsg->isScheduled());
+        ASSERT(m_delayedTransfer->isScheduled());
 
-        cancelEvent(m_flowControlMsg);
+        cancelEvent(m_delayedTransfer);
 
-        delete(msg);
+        delete m_delayedTransfer;
+        m_delayedTransfer = NULL;
     }
+
+    m_activeRequest = false;
+    delete grant;
 
     doTransfer();
 }
 
-void LISNoCBaseModule::handleIncomingRequest(LISNoCFlowControlMsg *msg)
+void LISNoCBaseModule::handleIncomingRequest(LISNoCFlowControlRequest *request)
 {
-    msg->setKind(LISNOC_GRANT);
-    msg->setAck(isRequestGranted(msg));
+    bool ack = isRequestGranted(request);
 
-    if (!msg->getAck() && msg->getAllowLateAck()) {
-        m_pendingRequestWithLateAck.first = true;
+    if (!ack && request->getAllowLateAck()) {
+        m_pendingRequestWithLateAck.first = request;
         m_pendingRequestWithLateAck.second = simTime();
     } else {
-        m_pendingRequestWithLateAck.first = false;
+        delete m_pendingRequestWithLateAck.first;
+        m_pendingRequestWithLateAck.first = NULL;
     }
 
-    m_incomingFlowControlMsg = msg;
+    LISNoCFlowControlGrant *grant = createFlowControlGrant(request);
+    grant->setAck(ack);
 
     if (hasGate("fc_grant_out", 0)) {
-        sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out", 0);
+        sendDelayed(grant, SIMTIME_ZERO, "fc_grant_out", 0);
     } else {
-        sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out");
+        sendDelayed(grant, SIMTIME_ZERO, "fc_grant_out");
+    }
+
+    if (ack || !request->getAllowLateAck()) {
+        delete request;
     }
 }
 
 void LISNoCBaseModule::tryLateGrant() {
     if (m_pendingRequestWithLateAck.first) {
         ASSERT(m_pendingRequestWithLateAck.second == simTime());
-        LISNoCFlowControlMsg *msg = new LISNoCFlowControlMsg();
-        msg->setKind(LISNOC_GRANT);
-        msg->setAck(true);
-        msg->setIsLateAck(true);
+        LISNoCFlowControlRequest *request = m_pendingRequestWithLateAck.first;
+        LISNoCFlowControlGrant *grant = createFlowControlGrant(request);
+        grant->setAck(true);
+        grant->setIsLateAck(true);
 
         if (hasGate("fc_grant_out", 0)) {
-            sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out", 0);
+            sendDelayed(grant, SIMTIME_ZERO, "fc_grant_out", 0);
         } else {
-            sendDelayed(msg, SIMTIME_ZERO, "fc_grant_out");
+            sendDelayed(grant, SIMTIME_ZERO, "fc_grant_out");
         }
-        m_pendingRequestWithLateAck.first = false;
+
+        delete request;
+        m_pendingRequestWithLateAck.first = NULL;
     }
 }
 
 void LISNoCBaseModule::finish()
 {
-    if (m_incomingFlowControlMsg &&
-            (m_incomingFlowControlMsg->getOwner() != this)) {
-        m_incomingFlowControlMsg = NULL;
-    }
-
-    if (m_flowControlMsg->getOwner() != this) {
-        m_flowControlMsg = NULL;
+    cancelEvent(m_selfTrigger);
+    if (m_delayedTransfer) {
+        cancelEvent(m_delayedTransfer);
     }
 }
 
 LISNoCBaseModule::~LISNoCBaseModule()
 {
-    cancelAndDelete(m_selfTrigger);
-
-    // Delete messages (not necessary to check if nullptr)
-    delete m_incomingFlowControlMsg;
-    delete m_flowControlMsg;
-
+    delete m_selfTrigger;
+    delete m_delayedTransfer;
+    delete m_pendingRequestWithLateAck.first;
 }
 
 } /* namespace lisnoc */

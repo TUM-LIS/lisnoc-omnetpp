@@ -17,7 +17,7 @@
 #define __LISNOC_ROUTERSWITCH_H_
 
 #include <omnetpp.h>
-#include <LISNoC_m.h>
+#include <LISNoCMessages.h>
 
 namespace lisnoc {
 
@@ -57,15 +57,15 @@ private:
     };
 
     std::vector<std::vector<Arbiter*> > m_outputArbiters;
-    std::vector<std::vector<LISNoCFlowControlMsg> > m_outputRequests;
+    std::vector<std::vector<LISNoCFlowControlRequest*> > m_outputRequests;
 
-    std::vector<std::vector<LISNoCFlowControlMsg*> > m_inputRequests;
+    std::vector<std::vector<LISNoCFlitControlInfo*> > m_inputRequests;
 
   protected:
     virtual void initialize();
     virtual void handleMessage(cMessage *msg);
-    virtual void handleMessageRequest(LISNoCFlowControlMsg *msg);
-    virtual void handleMessageGrant(LISNoCFlowControlMsg *msg);
+    virtual void handleMessageRequest(LISNoCFlowControlRequest *msg);
+    virtual void handleMessageGrant(LISNoCFlowControlGrant *msg);
     virtual void handleMessageFlit(LISNoCFlit *msg);
     virtual void arbitrate();
 };

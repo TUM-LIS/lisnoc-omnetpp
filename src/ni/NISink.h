@@ -37,7 +37,7 @@ class NISink : public LISNoCBaseModule
     virtual void handleSelfMessage(cMessage *msg) {};
     virtual void doTransfer() {};
 
-    virtual bool isRequestGranted(LISNoCFlowControlMsg *msg);
+    virtual bool isRequestGranted(LISNoCFlowControlRequest *msg);
 
   private:
 
