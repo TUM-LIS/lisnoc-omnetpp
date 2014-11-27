@@ -34,6 +34,7 @@ if __name__=="__main__":
     datestr = datetime.now().strftime("%Y%m%d-%H%M%S")
     resultdir = "results-{datestr}".format(datestr=datestr)
     os.mkdir(resultdir)
+    subprocess.call("cp omnetpp.ini {0}".format(resultdir), shell=True)
 
     for r in range(runs):
         job = {}
