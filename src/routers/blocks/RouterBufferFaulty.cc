@@ -74,8 +74,14 @@ void RouterBufferFaulty::initialize(int stage) {
 }
 
 bool RouterBufferFaulty::sampleFault() {
-    double sample = double(rand())/RAND_MAX;
-    return (sample <= 32.0*double(par("p_bitflip_link")));
+    // TODO: maybe more efficient with binom coeff?
+    for (int i = 0; i < 32; i++) {
+        double sample = double(rand())/RAND_MAX;
+        if (sample <= double(par("p_bitflip_link"))) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // bits, time
