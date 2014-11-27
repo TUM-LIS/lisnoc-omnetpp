@@ -26,6 +26,8 @@ class NIStatisticsUnit : public cSimpleModule
 
     void collectFlitLatency(int networkAccessLatency, int networkLatency);
     void reportFlitArrivedFaulty(bool faulty);
+    void reportPacketArrivedFaulty(bool faulty);
+
 
     cLongHistogram* getHistFlitNetworkAccessLatency() {
         return &m_flitNetworkAccessLatency;
@@ -49,6 +51,7 @@ class NIStatisticsUnit : public cSimpleModule
     cLongHistogram m_flitNetworkLatency;
     cLongHistogram m_flitTotalLatency;
     cHistogram m_flitArrivedFaulty;
+    cHistogram m_packetArrivedFaulty;
 };
 
 } //namespace

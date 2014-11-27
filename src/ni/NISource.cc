@@ -42,6 +42,8 @@ void NISource::genPacket()
     int numflits = 8;
     int dstId = par("dstId");
 
+    LISNoCPacket *packet = new LISNoCPacket(m_nextPacketId);
+
     for (int f = 0; f < numflits; f++) {
         LISNoCFlit *flit = new LISNoCFlit;
         LISNoCFlitControlInfo *controlInfo = new LISNoCFlitControlInfo;
@@ -49,16 +51,19 @@ void NISource::genPacket()
         controlInfo->setVC(0);
         controlInfo->setDstId(dstId);
         controlInfo->setSrcId(m_id);
-        controlInfo->setPacketId(m_nextPacketId++);
+        controlInfo->setPacketId(m_nextPacketId);
         flit->setBitLength(32);
         flit->setByteLength(4);
         controlInfo->setFlitId(f);
         controlInfo->setIsHead(f==0);
         controlInfo->setIsTail(f==numflits-1);
         flit->setGenerationTime(simTime());
+        flit->setPacket(packet);
 
         m_queue.insert(flit);
     }
+
+    m_nextPacketId++;
 
     if (canRequestTransfer((LISNoCFlit*) m_queue.front())) {
         requestTransfer((LISNoCFlit*) m_queue.front());

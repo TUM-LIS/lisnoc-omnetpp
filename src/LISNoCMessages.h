@@ -9,6 +9,7 @@
 #define LISNOCMESSAGES_H_
 
 #include <LISNoC_m.h>
+#include <LISNoCPacket.h>
 
 namespace lisnoc {
 
@@ -16,11 +17,14 @@ namespace lisnoc {
      {
        private:
         void copy(const LISNoCFlit& other) { }
+        LISNoCPacket *m_packet;
        public:
-         LISNoCFlit(const char *name=NULL, int kind=0) : LISNoCFlit_Base(name,LISNOC_FLIT) {}
+         LISNoCFlit(const char *name=NULL, int kind=0) : LISNoCFlit_Base(name,LISNOC_FLIT), m_packet(NULL) {}
          LISNoCFlit(const LISNoCFlit& other) : LISNoCFlit_Base(other) {copy(other);}
          LISNoCFlit& operator=(const LISNoCFlit& other) {if (this==&other) return *this; LISNoCFlit_Base::operator=(other); copy(other); return *this;}
          virtual LISNoCFlit *dup() const {return new LISNoCFlit(*this);}
+         void setPacket(LISNoCPacket *packet) { m_packet = packet; }
+         LISNoCPacket* getPacket() { return m_packet; }
      };
 
     class LISNoCFlowControlRequest : public LISNoCFlowControlRequest_Base

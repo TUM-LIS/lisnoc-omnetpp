@@ -47,6 +47,12 @@ void NISink::handleIncomingFlit(LISNoCFlit *msg)
             (simTime()-msg->getSendTime()).inUnit(SIMTIME_NS)
             );
 
+    LISNoCFlitControlInfo *ctrlInfo = (LISNoCFlitControlInfo*) msg->getControlInfo();
+
+    if(ctrlInfo->getIsTail()) {
+        delete msg->getPacket();
+    }
+
     delete(msg);
 }
 

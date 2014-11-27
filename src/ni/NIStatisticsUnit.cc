@@ -41,11 +41,16 @@ void NIStatisticsUnit::reportFlitArrivedFaulty(bool faulty) {
     m_flitArrivedFaulty.collect(faulty);
 }
 
+void NIStatisticsUnit::reportPacketArrivedFaulty(bool faulty) {
+    m_packetArrivedFaulty.collect(faulty);
+}
+
 void NIStatisticsUnit::finish() {
     m_flitNetworkLatency.recordAs("flit_network_latency");
     m_flitNetworkAccessLatency.recordAs("flit_network_access_latency");
     m_flitTotalLatency.recordAs("flit_total_latency");
     m_flitArrivedFaulty.recordAs("flit_arrived_faulty");
+    m_packetArrivedFaulty.recordAs("packet_arrived_faulty");
 }
 
 } //namespace
