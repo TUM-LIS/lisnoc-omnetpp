@@ -128,13 +128,13 @@ void RouterBufferFaulty::doTransfer() {
             bool fault = sampleFault();
             if (fault) {
                 int bit = rand() % 32;
-                std::cout << "[" << simTime() << "," << getFullPath() << "] FAULT!!!" << std::endl;
+//                std::cout << "[" << simTime() << "," << getFullPath() << "] FAULT!!!" << std::endl;
                 RouterBufferFaulty::Pentry_t e = sampleFaultCharacteristic();
                 Pw_t w = e.first;
                 Pt_t t = e.second;
 
                 std::pair<int, int> range = getNeighborRange(bit, w);
-                std::cout << "[" << simTime() << "," << getFullPath() << "] -> flip bits " << range.first << " to " << (range.second-1) << std::endl;
+//                std::cout << "[" << simTime() << "," << getFullPath() << "] -> flip bits " << range.first << " to " << (range.second-1) << std::endl;
                 for (int b = range.first; b < range.second; b++) {
                     errorVector ^= (1 << b);
                     flipped |= (1 << b);
@@ -151,7 +151,7 @@ void RouterBufferFaulty::doTransfer() {
             }
 
             if (m_temp_bitflip_bits[i] > 0) {
-                std::cout << "[" << simTime() << "," << getFullPath() << "] Temporal flip of bit " << i << std::endl;
+//                std::cout << "[" << simTime() << "," << getFullPath() << "] Temporal flip of bit " << i << std::endl;
                 errorVector ^= (1 << i);
                 m_temp_bitflip_bits[i]--;
             }
