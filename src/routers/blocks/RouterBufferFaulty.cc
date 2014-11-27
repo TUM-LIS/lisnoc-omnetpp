@@ -75,7 +75,7 @@ void RouterBufferFaulty::initialize(int stage) {
 
 bool RouterBufferFaulty::sampleFault() {
     double sample = double(rand())/RAND_MAX;
-    return (sample <= double(par("p_bitflip_buffer")));
+    return (sample <= 32.0*double(par("p_bitflip_link")));
 }
 
 // bits, time
@@ -118,15 +118,16 @@ void RouterBufferFaulty::doTransfer() {
     // for the link
     if(strcmp(m_type, "out") == 0) {
         int flipped = 0;
-        for(int i=0; i<32; i++) {
+        //for(int i=0; i<32; i++) {
             bool fault = sampleFault();
             if (fault) {
+                int bit = rand() % 32;
                 std::cout << "[" << simTime() << "," << getFullPath() << "] FAULT!!!" << std::endl;
                 RouterBufferFaulty::Pentry_t e = sampleFaultCharacteristic();
                 Pw_t w = e.first;
                 Pt_t t = e.second;
 
-                std::pair<int, int> range = getNeighborRange(i, w);
+                std::pair<int, int> range = getNeighborRange(bit, w);
                 std::cout << "[" << simTime() << "," << getFullPath() << "] -> flip bits " << range.first << " to " << (range.second-1) << std::endl;
                 for (int b = range.first; b < range.second; b++) {
                     errorVector ^= (1 << b);
@@ -134,9 +135,9 @@ void RouterBufferFaulty::doTransfer() {
                     ASSERT(t>0);
                     m_temp_bitflip_bits[b] = t-1;
                 }
-                break; // We don't need another fault..
+                //break; // We don't need another fault..
             }
-        }
+        //}
 
         for (int i = 0; i < 32; i++) {
             if (flipped & (1 << i)) {
