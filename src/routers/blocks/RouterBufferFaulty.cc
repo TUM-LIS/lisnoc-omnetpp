@@ -111,10 +111,7 @@ std::pair<int, int> RouterBufferFaulty::getNeighborRange(int bit, int count) {
 void RouterBufferFaulty::doTransfer() {
 
     LISNoCFlit *flit = (LISNoCFlit*) m_buffer.front();
-    int bufferTime = (simTime().inUnit(SIMTIME_NS) - flit->getArrivalTime().inUnit(SIMTIME_NS));
-
-    double pBitFlip;
-    double randVal;
+    //int bufferTime = (simTime().inUnit(SIMTIME_NS) - flit->getArrivalTime().inUnit(SIMTIME_NS));
 
     int errorVector = flit->getErrorVector();
 
@@ -134,7 +131,8 @@ void RouterBufferFaulty::doTransfer() {
                 for (int b = range.first; b < range.second; b++) {
                     errorVector ^= (1 << b);
                     flipped |= (1 << b);
-                    m_temp_bitflip_bits[b] = t;
+                    ASSERT(t>0);
+                    m_temp_bitflip_bits[b] = t-1;
                 }
                 break; // We don't need another fault..
             }
