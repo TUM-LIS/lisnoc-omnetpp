@@ -34,6 +34,7 @@ protected:
     int m_id;
     cMessage *m_timerMessage;
     cQueue m_queue;
+    int m_abortAccessLatency;
 
   protected:
     virtual void initialize();

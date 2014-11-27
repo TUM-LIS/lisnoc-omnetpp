@@ -27,6 +27,7 @@ simple NISource
         volatile int dstId = default(-1);
         volatile int initialdelay = default(0);
         volatile int genDelay = default(100);
+        int abortAccessLatency = default(1000);
     @display("i=block/source");
     gates:
         output out[nVCs];
