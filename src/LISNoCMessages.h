@@ -15,7 +15,7 @@ namespace lisnoc {
     class LISNoCFlit : public LISNoCFlit_Base
      {
        private:
-        void copy(const LISNoCFlit& other) { ASSERT(false); }
+        void copy(const LISNoCFlit& other) { }
        public:
          LISNoCFlit(const char *name=NULL, int kind=0) : LISNoCFlit_Base(name,LISNOC_FLIT) {}
          LISNoCFlit(const LISNoCFlit& other) : LISNoCFlit_Base(other) {copy(other);}
@@ -26,7 +26,7 @@ namespace lisnoc {
     class LISNoCFlowControlRequest : public LISNoCFlowControlRequest_Base
     {
     private:
-        void copy(const LISNoCFlowControlRequest& other) { ASSERT(false); }
+        void copy(const LISNoCFlowControlRequest& other) { }
 
     public:
         LISNoCFlowControlRequest(const char *name=NULL, int kind=0) : LISNoCFlowControlRequest_Base(name,LISNOC_REQUEST) {}
@@ -39,7 +39,7 @@ namespace lisnoc {
     class LISNoCFlowControlGrant : public LISNoCFlowControlGrant_Base
     {
     private:
-        void copy(const LISNoCFlowControlGrant& other) { ASSERT(false); }
+        void copy(const LISNoCFlowControlGrant& other) { }
     public:
         LISNoCFlowControlGrant(const char *name=NULL, int kind=0) : LISNoCFlowControlGrant_Base(name,LISNOC_GRANT) {}
         LISNoCFlowControlGrant(const LISNoCFlowControlGrant& other) : LISNoCFlowControlGrant_Base(other) {copy(other);}
