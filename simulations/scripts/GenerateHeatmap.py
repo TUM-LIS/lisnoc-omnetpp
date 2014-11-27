@@ -23,15 +23,19 @@ for i in files:
         m = re.search("router\[(\d+)\].statisticsUnit,inBuffer_(\d+)_vc_(\d+)_latency:mean,(\d+(\.\d+)?)", l)
         if m:
             idx = int(m.group(1))
-            if idx not in heatcollect:
-                heatcollect[idx] = []
-            heatcollect[idx].append(float(m.group(4)))
+            mean = float(m.group(4))
+            if mean > 0:
+                if idx not in heatcollect:
+                    heatcollect[idx] = []
+                heatcollect[idx].append(mean)
         m = re.search("router\[(\d+)\].statisticsUnit,outBuffer_(\d+)_vc_(\d+)_latency:mean,(\d+(\.\d+)?)", l)
         if m:
             idx = int(m.group(1))
-            if idx not in heatcollect:
-                heatcollect[idx] = []
-            heatcollect[idx].append(float(m.group(4)))
+            mean = float(m.group(4))
+            if mean > 0:
+                if idx not in heatcollect:
+                    heatcollect[idx] = []
+                heatcollect[idx].append(mean)
 
     for idx in heatcollect.keys():
         heat[idx] = sum(heatcollect[idx])/len(heatcollect[idx])
