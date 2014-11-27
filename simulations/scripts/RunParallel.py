@@ -34,6 +34,7 @@ if __name__=="__main__":
     datestr = datetime.now().strftime("%Y%m%d-%H%M%S")
     resultdir = "results-{datestr}".format(datestr=datestr)
     os.mkdir(resultdir)
+    subprocess.call("cp omnetpp.ini {0}".format(resultdir), shell=True)
 
     for r in range(runs):
         job = {}
@@ -45,7 +46,6 @@ if __name__=="__main__":
     pool = Pool()
     try:
         pool.map(execute, jobs)
-        pool.join()
     except KeyboardInterrupt:
         print "(Ctrl-C)"
         pool.terminate()

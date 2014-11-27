@@ -31,6 +31,8 @@ void NISource::initialize()
     if ((int) par("dstId") >= 0) {
         triggerSelf((int) par("initialdelay"), m_timerMessage);
     }
+
+    m_abortAccessLatency = par("abortAccessLatency");
 }
 
 void NISource::genPacket()
@@ -63,9 +65,15 @@ void NISource::doTransfer()
 {
     ASSERT(m_queue.getLength() > 0);
 
-    ((LISNoCFlit*) m_queue.front())->setSendTime(simTime());
+    // Pop next flit from queue
+    LISNoCFlit *flit = (LISNoCFlit*) m_queue.pop();
 
-    sendDelayed((cMessage*)m_queue.pop(), SIMTIME_ZERO, "out", 0);
+    if ((simTime() - flit->getGenerationTime()).inUnit(SIMTIME_NS) >= m_abortAccessLatency) {
+        endSimulation();
+    }
+    flit->setSendTime(simTime());
+
+    sendDelayed(flit, SIMTIME_ZERO, "out", 0);
 
     if (m_queue.getLength() > 0) {
         requestTransferAfter((LISNoCFlit*) m_queue.front(), 1);
