@@ -37,6 +37,7 @@ packet LISNoCFlit {
   	uint8_t data[];
   	simtime_t generationTime;
   	simtime_t sendTime;
+  	int errorVector;
 }
 
 packet LISNoCFlowControlRequest {

@@ -23,7 +23,9 @@ namespace lisnoc {
 class NIStatisticsUnit : public cSimpleModule
 {
   public:
+
     void collectFlitLatency(int networkAccessLatency, int networkLatency);
+    void reportFlitArrivedFaulty(bool faulty);
 
     cLongHistogram* getHistFlitNetworkAccessLatency() {
         return &m_flitNetworkAccessLatency;
@@ -46,6 +48,7 @@ class NIStatisticsUnit : public cSimpleModule
     cLongHistogram m_flitNetworkAccessLatency;
     cLongHistogram m_flitNetworkLatency;
     cLongHistogram m_flitTotalLatency;
+    cHistogram m_flitArrivedFaulty;
 };
 
 } //namespace

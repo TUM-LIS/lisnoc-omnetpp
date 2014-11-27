@@ -13,35 +13,16 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#ifndef __LISNOC_NISINK_H
-#define __LISNOC_NISINK_H
+package lisnoc.routers.blocks;
 
-#include <omnetpp.h>
-
-#include <LISNoC_m.h>
-#include <LISNoCBaseModule.h>
-
-namespace lisnoc {
-
-class NIStatisticsUnit;
-
-/**
- * Message sink; see NED file for more info.
- */
-class NISink : public LISNoCBaseModule
+//
+// TODO auto-generated module
+//
+simple RouterBufferFaulty extends RouterBuffer
 {
-  protected:
-    virtual int numInitStages() const;
-    virtual void initialize(int stage);
-    virtual void handleIncomingFlit(LISNoCFlit *msg);
-    virtual void handleSelfMessage(cMessage *msg) {};
-    virtual void doTransfer() {};
-
-    virtual bool isRequestGranted(LISNoCFlowControlRequest *msg);
-
-    NIStatisticsUnit *m_niSU;
-};
-
-}; // namespace
-
-#endif
+    parameters:
+        double p_bitflip_buffer;
+        double p_bitflip_link;
+    
+    @class(RouterBufferFaulty);
+}

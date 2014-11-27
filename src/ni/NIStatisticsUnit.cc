@@ -37,11 +37,15 @@ void NIStatisticsUnit::collectFlitLatency(int networkAccessLatency, int networkL
     m_flitTotalLatency.collect(networkAccessLatency+networkLatency);
 }
 
+void NIStatisticsUnit::reportFlitArrivedFaulty(bool faulty) {
+    m_flitArrivedFaulty.collect(faulty);
+}
 
 void NIStatisticsUnit::finish() {
     m_flitNetworkLatency.recordAs("flit_network_latency");
     m_flitNetworkAccessLatency.recordAs("flit_network_access_latency");
     m_flitTotalLatency.recordAs("flit_total_latency");
+    m_flitArrivedFaulty.recordAs("flit_arrived_faulty");
 }
 
 } //namespace

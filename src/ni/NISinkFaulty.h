@@ -13,46 +13,20 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#ifndef __LISNOC_ROUTERBUFFER_H_
-#define __LISNOC_ROUTERBUFFER_H_
+#ifndef __LISNOC_NISINKFAULTY_H_
+#define __LISNOC_NISINKFAULTY_H_
 
-#include <omnetpp.h>
-
-#include <LISNoC_m.h>
-#include <LISNoCBaseModule.h>
+#include "NISink.h"
 
 namespace lisnoc {
-
-class RouterStatisticsUnit;
 
 /**
  * TODO - Generated class
  */
-class RouterBuffer : public LISNoCBaseModule
+class NISinkFaulty : public NISink
 {
-public:
-    virtual ~RouterBuffer();
-private:
-    int m_maxfill;
-    cMessage m_timerMsg;
-
-    RouterStatisticsUnit* m_routerSU;
-
-    int m_portId;
-    int m_vcId;
   protected:
-    virtual void finish();
-    virtual int numInitStages() const { return 2; }
-    virtual void initialize(int stage);
-    virtual void handleSelfMessage(cMessage *msg);
     virtual void handleIncomingFlit(LISNoCFlit *msg);
-    virtual void trySend();
-
-    virtual void doTransfer();
-    virtual bool isRequestGranted(LISNoCFlowControlRequest *msg);
-
-    const char *m_type;
-    cQueue m_buffer;
 };
 
 } //namespace
