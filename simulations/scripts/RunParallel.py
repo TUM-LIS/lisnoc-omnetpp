@@ -46,7 +46,6 @@ if __name__=="__main__":
     pool = Pool()
     try:
         pool.map(execute, jobs)
-        pool.join()
     except KeyboardInterrupt:
         print "(Ctrl-C)"
         pool.terminate()
