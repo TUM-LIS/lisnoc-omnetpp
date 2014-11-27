@@ -20,7 +20,7 @@ for i in files:
     heat = {}
 
     for l in f:
-        m = re.search("router\[(\d+)\].statisticsUnit,inBuffer_(\d+)_vc_(\d+)_latency:mean,(\d+\.\d+)", l)
+        m = re.search("router\[(\d+)\].statisticsUnit,inBuffer_(\d+)_vc_(\d+)_latency:mean,(\d+(\.\d+)?)", l)
         if m:
             idx = int(m.group(1))
             if idx not in heatcollect:
