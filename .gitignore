@@ -10,3 +10,6 @@ src/LISNoC_m.cc
 .tkenvrc
 *.anf
 results/
+
+# Temporary files
+*~
