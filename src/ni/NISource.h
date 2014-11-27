@@ -35,6 +35,7 @@ protected:
     cMessage *m_timerMessage;
     cQueue m_queue;
     int m_abortAccessLatency;
+    int m_nextPacketId;
 
   protected:
     virtual void initialize();

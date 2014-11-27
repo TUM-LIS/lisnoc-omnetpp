@@ -33,6 +33,8 @@ void NISource::initialize()
     }
 
     m_abortAccessLatency = par("abortAccessLatency");
+
+    m_nextPacketId = 0;
 }
 
 void NISource::genPacket()
@@ -46,6 +48,8 @@ void NISource::genPacket()
         flit->setControlInfo(controlInfo);
         controlInfo->setVC(0);
         controlInfo->setDstId(dstId);
+        controlInfo->setSrcId(m_id);
+        controlInfo->setPacketId(m_nextPacketId++);
         flit->setBitLength(32);
         flit->setByteLength(4);
         controlInfo->setFlitId(f);
