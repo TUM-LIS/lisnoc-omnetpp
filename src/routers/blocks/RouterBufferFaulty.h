@@ -32,6 +32,11 @@ class RouterBufferFaulty : public RouterBuffer
   private:
     double m_p_bitflip_buffer;
     double m_p_bitflip_link;
+    double m_p_bitflip_link_next_cycle;
+    int m_temp_bitflip_window;
+
+    int m_nContBitFlips[32]; // one value for each wire of the link
+
 };
 
 } //namespace
