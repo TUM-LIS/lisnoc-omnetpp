@@ -21,8 +21,8 @@ package lisnoc.routers.blocks;
 simple RouterBufferFaulty extends RouterBuffer
 {
     parameters:
-        double p_bitflip_buffer;
-        double p_bitflip_link;
+        double p_bitflip_buffer = default(1.0e-9);
+        double p_bitflip_link = default(1.0e-9);
     
     @class(RouterBufferFaulty);
 }

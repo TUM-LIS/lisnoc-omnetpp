@@ -32,11 +32,19 @@ class RouterBufferFaulty : public RouterBuffer
   private:
     double m_p_bitflip_buffer;
     double m_p_bitflip_link;
-    double m_p_bitflip_link_next_cycle;
-    int m_temp_bitflip_window;
+    std::vector<int> m_temp_bitflip_bits;
 
-    int m_nContBitFlips[32]; // one value for each wire of the link
 
+    bool sampleFault();
+
+    typedef int Pw_t;
+    typedef int Pt_t;
+    typedef std::pair<Pw_t, Pt_t> Pentry_t;
+    Pentry_t sampleFaultCharacteristic();
+    typedef std::vector<std::pair<double, Pentry_t > > P_t;
+    P_t m_P3;
+
+    std::pair<int, int> getNeighborRange(int bit, int count);
 };
 
 } //namespace
