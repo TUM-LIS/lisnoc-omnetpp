@@ -26,8 +26,6 @@ module RouterBufferedFaulty
         int nPorts;
         int nVCs;
         int id;
-        double p_bitflip_buffer;
-        double p_bitflip_link;
         string p_faultModel = default("lisnoc.routers.blocks.faultModels.FaultModelSimple");
 
         @display("i=abstract/router");
@@ -47,16 +45,12 @@ module RouterBufferedFaulty
                 nVCs = nVCs;
                 routerId = id;
                 portId = index;
-                p_bitflip_buffer = p_bitflip_buffer;
-                p_bitflip_link = p_bitflip_link;
         }
         outPort[nPorts]: RouterOutPortFaulty {
             parameters:
                 nVCs = nVCs;
                 routerId = id;
                 portId = index;
-                p_bitflip_buffer = p_bitflip_buffer;
-                p_bitflip_link = p_bitflip_link;
         }
         switch: RouterSwitch {
             parameters:

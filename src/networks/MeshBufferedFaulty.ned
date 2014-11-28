@@ -27,8 +27,6 @@ network MeshBufferedFaulty {
 	    int rows = default(4);
 	    int nPorts = 5;
 	    int nVCs = default(1);
-	    double p_bitflip_buffer;
-	    double p_bitflip_link;
 	    
 	submodules:
 	    router[columns*rows]: RouterBufferedFaulty {
@@ -36,8 +34,6 @@ network MeshBufferedFaulty {
 	    	    nPorts = nPorts;
 	    	    nVCs = nVCs;
 	    	    id = index;   
-	    	    p_bitflip_buffer = p_bitflip_buffer;
-	    	    p_bitflip_link = p_bitflip_link;
 	        @display("p=100,100,m,$columns,100,100");
 	    }
 	    

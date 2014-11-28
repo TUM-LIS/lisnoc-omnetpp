@@ -25,19 +25,12 @@ Define_Module(RouterBufferFaulty);
 
 void RouterBufferFaulty::initialize(int stage) {
     if(stage == 0) {
-        m_p_bitflip_buffer = par("p_bitflip_buffer");
-        m_p_bitflip_link = par("p_bitflip_link");
-
         m_temp_bitflip_bits.resize(32, 0);
-
     } else if (stage == 1) {
         m_faultmodel = FaultModelRegistry::s_getFaultModelRegistry()->getRouterFaultModel(par("routerId"));
     }
 
-
     RouterBuffer::initialize(stage);
-
-
 }
 
 std::pair<int, int> RouterBufferFaulty::getNeighborRange(int bit, int count) {

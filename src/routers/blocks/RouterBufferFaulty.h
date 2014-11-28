@@ -33,8 +33,6 @@ class RouterBufferFaulty : public RouterBuffer
     virtual void doTransfer();
 
   private:
-    double m_p_bitflip_buffer;
-    double m_p_bitflip_link;
     std::vector<int> m_temp_bitflip_bits;
 
     FaultModelBase *m_faultmodel;

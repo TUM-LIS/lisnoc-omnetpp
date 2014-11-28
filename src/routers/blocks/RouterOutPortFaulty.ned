@@ -21,8 +21,6 @@ module RouterOutPortFaulty
         int nVCs;
         int routerId;
         int portId;
-        double p_bitflip_buffer;
-        double p_bitflip_link;
 
     @display("i=block/join");
         
@@ -43,8 +41,6 @@ module RouterOutPortFaulty
    	            routerId = routerId;
    	            portId = portId;
    	            vcId = index;
-   	            p_bitflip_buffer = p_bitflip_buffer;
-   	            p_bitflip_link = p_bitflip_link;
    	    }
         
     connections:
