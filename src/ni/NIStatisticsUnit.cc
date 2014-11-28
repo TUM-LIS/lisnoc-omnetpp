@@ -20,15 +20,31 @@ namespace lisnoc {
 
 Define_Module(NIStatisticsUnit);
 
+#define CONV_INTERVAL simtime_t(500, SIMTIME_US)
+
 void NIStatisticsUnit::initialize()
 {
     GlobalStatisticsUnit::s_getGlobalStatisticsUnit()->registerNIStatisticsUnit(par("id"), this);
+
+    m_packetCount = 0;
+    m_faultyPacketCount = 0;
+
+    scheduleAt(CONV_INTERVAL, new cMessage);
 }
 
 void NIStatisticsUnit::handleMessage(cMessage *msg)
 {
-    // should never happen
-    ASSERT(false);
+    ASSERT(msg->isSelfMessage());
+    delete msg;
+
+    if (int(par("id")) != 14) {
+        return;
+    }
+
+    double conv = double(m_faultyPacketCount) / double(m_packetCount);
+
+    std::cout << simTime() << " CONVERGENCE: " << conv << std::endl;
+    scheduleAt(simTime() + CONV_INTERVAL, new cMessage);
 }
 
 void NIStatisticsUnit::collectFlitLatency(int networkAccessLatency, int networkLatency) {
@@ -42,6 +58,8 @@ void NIStatisticsUnit::reportFlitArrivedFaulty(bool faulty) {
 }
 
 void NIStatisticsUnit::reportPacketArrivedFaulty(bool faulty) {
+    m_packetCount++;
+    if (faulty) m_faultyPacketCount++;
     m_packetArrivedFaulty.collect(faulty);
 }
 

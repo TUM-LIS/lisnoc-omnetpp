@@ -52,6 +52,9 @@ class NIStatisticsUnit : public cSimpleModule
     cLongHistogram m_flitTotalLatency;
     cHistogram m_flitArrivedFaulty;
     cHistogram m_packetArrivedFaulty;
+
+    unsigned int m_packetCount;
+    unsigned int m_faultyPacketCount;
 };
 
 } //namespace
