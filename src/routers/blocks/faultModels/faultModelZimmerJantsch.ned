@@ -23,7 +23,8 @@ module FaultModelZimmerJantsch like FaultModelBase
     parameters:
         int routerId;
         int example = default(3);
-        double p_fault;
+        double p_faultLink;
+        double p_faultBuffer;
         
     @class("FaultModelZimmerJantsch");
 }

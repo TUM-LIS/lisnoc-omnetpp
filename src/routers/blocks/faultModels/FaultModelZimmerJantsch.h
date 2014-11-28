@@ -22,15 +22,18 @@ private:
     typedef std::vector<Pentry_t> P_t;
     P_t m_P3;
 
-    double m_p_fault;
+    double m_p_faultLink;
+    double m_p_faultBuffer;
 
-    std::discrete_distribution<> *m_sampleFaultDistribution;
+    std::discrete_distribution<> *m_sampleFaultDistributionLink;
+    std::discrete_distribution<> *m_sampleFaultDistributionBuffer;
     std::discrete_distribution<> *m_sampleCharacteristicDistribution;
 
 protected:
     virtual void initialize(int stage);
 public:
-    virtual bool sampleFault();
+    virtual bool sampleFaultLink();
+    virtual bool sampleFaultBuffer();
     virtual void sampleFaultCharacteristics(std::vector<struct FaultCharacteristics> &faultVector);
 };
 

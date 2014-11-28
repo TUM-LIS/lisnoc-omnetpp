@@ -22,6 +22,7 @@ module FaultModelSimple like FaultModelBase
 {
     parameters:
         int routerId;
-        double p_bitFlip;
+        double p_bitFlipLink;
+        double p_bitFlipBuffer;
     @class("FaultModelSimple");
 }

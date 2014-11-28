@@ -15,7 +15,8 @@ namespace lisnoc {
         if (stage == 0) {
             ASSERT(int(par("example"))==3);
 
-            m_p_fault = par("p_fault");
+            m_p_faultLink = par("p_faultLink");
+            m_p_faultBuffer = par("p_faultBuffer");
 
             std::vector<double> weights;
             weights.push_back(0.6768); m_P3.push_back(std::make_pair(1,1));
@@ -38,7 +39,8 @@ namespace lisnoc {
             weights.push_back(0.0013); m_P3.push_back(std::make_pair(1,4));
             weights.push_back(0.0003); m_P3.push_back(std::make_pair(2,4));
 
-            m_sampleFaultDistribution = new std::discrete_distribution<>({m_p_fault,1.0 - m_p_fault});
+            m_sampleFaultDistributionLink = new std::discrete_distribution<>({m_p_faultLink, 1.0 - m_p_faultLink});
+            m_sampleFaultDistributionBuffer = new std::discrete_distribution<>({m_p_faultBuffer, 1.0 - m_p_faultBuffer});
             m_sampleCharacteristicDistribution = new std::discrete_distribution<>(weights.begin(), weights.end());
         }
 
@@ -46,11 +48,22 @@ namespace lisnoc {
         FaultModelBase::initialize(stage);
     }
 
-    bool FaultModelZimmerJantsch::sampleFault() {
+    bool FaultModelZimmerJantsch::sampleFaultLink() {
         static std::default_random_engine generator;
 
         for (int i = 0; i < 32; i++) {
-            if ((*m_sampleFaultDistribution)(generator) == 0) {
+            if ((*m_sampleFaultDistributionLink)(generator) == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool FaultModelZimmerJantsch::sampleFaultBuffer() {
+        static std::default_random_engine generator;
+
+        for (int i = 0; i < 32; i++) {
+            if ((*m_sampleFaultDistributionBuffer)(generator) == 0) {
                 return true;
             }
         }

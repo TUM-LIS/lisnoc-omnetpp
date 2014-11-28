@@ -36,7 +36,8 @@ namespace lisnoc {
         virtual void handleMessage(cMessage *msg);
         virtual void finish();
     public:
-        virtual bool sampleFault() = 0;
+        virtual bool sampleFaultLink() = 0;
+        virtual bool sampleFaultBuffer() = 0;
         virtual void sampleFaultCharacteristics(std::vector<struct FaultCharacteristics> &faultVector) = 0;
     };
 

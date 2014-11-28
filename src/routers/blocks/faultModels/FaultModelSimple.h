@@ -24,13 +24,16 @@ namespace lisnoc {
 
 class FaultModelSimple: public lisnoc::FaultModelBase {
 private:
-    double m_p_bitFlip;
+    double m_p_bitFlipLink;
+    double m_p_bitFlipBuffer;
     unsigned int m_currentFlipVector;
-    std::discrete_distribution<> *m_sampleDistribution;
+    std::discrete_distribution<> *m_sampleDistributionLink;
+    std::discrete_distribution<> *m_sampleDistributionBuffer;
 protected:
     virtual void initialize(int stage);
 public:
-    virtual bool sampleFault();
+    virtual bool sampleFaultLink();
+    virtual bool sampleFaultBuffer();
     virtual void sampleFaultCharacteristics(std::vector<struct FaultCharacteristics> &faultVector);
 };
 

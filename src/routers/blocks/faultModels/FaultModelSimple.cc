@@ -21,20 +21,37 @@ namespace lisnoc {
 
     void FaultModelSimple::initialize(int stage) {
         ASSERT(stage == 0);
-        m_p_bitFlip = par("p_bitFlip");
-        FaultModelBase::initialize(stage);
+        m_p_bitFlipLink = par("p_bitFlipLink");
+        m_p_bitFlipBuffer = par("p_bitFlipBuffer");
 
-        m_sampleDistribution = new std::discrete_distribution<>({m_p_bitFlip,1.0 - m_p_bitFlip});
+        m_sampleDistributionLink = new std::discrete_distribution<>({m_p_bitFlipLink, 1.0 - m_p_bitFlipLink});
+        m_sampleDistributionBuffer = new std::discrete_distribution<>({m_p_bitFlipBuffer, 1.0 - m_p_bitFlipBuffer});
+
+        FaultModelBase::initialize(stage);
     }
 
-    bool FaultModelSimple::sampleFault() {
+    bool FaultModelSimple::sampleFaultLink() {
         static std::default_random_engine generator;
         m_currentFlipVector = 0;
 
         // TODO: bitwidth
         for (int i = 0; i < 32; i++) {
 
-            if ((*m_sampleDistribution)(generator) == 0) {
+            if ((*m_sampleDistributionLink)(generator) == 0) {
+                m_currentFlipVector |= (1 << i);
+            }
+        }
+        return (m_currentFlipVector != 0);
+    }
+
+    bool FaultModelSimple::sampleFaultBuffer() {
+        static std::default_random_engine generator;
+        m_currentFlipVector = 0;
+
+        // TODO: bitwidth
+        for (int i = 0; i < 32; i++) {
+
+            if ((*m_sampleDistributionBuffer)(generator) == 0) {
                 m_currentFlipVector |= (1 << i);
             }
         }

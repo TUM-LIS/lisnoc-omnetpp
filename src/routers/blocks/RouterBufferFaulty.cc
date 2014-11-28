@@ -52,15 +52,37 @@ std::pair<int, int> RouterBufferFaulty::getNeighborRange(int bit, int count) {
 void RouterBufferFaulty::doTransfer() {
 
     LISNoCFlit *flit = (LISNoCFlit*) m_buffer.front();
-    //int bufferTime = (simTime().inUnit(SIMTIME_NS) - flit->getArrivalTime().inUnit(SIMTIME_NS));
 
     int errorVector = flit->getErrorVector();
+
+    int bufferTime = (simTime().inUnit(SIMTIME_NS) - flit->getArrivalTime().inUnit(SIMTIME_NS));
+
+    for (int c = 0; c < bufferTime; c++) {
+        std::vector<struct FaultCharacteristics> faults;
+
+        bool fault = m_faultmodel->sampleFaultBuffer();
+
+        if (fault) {
+            m_faultmodel->sampleFaultCharacteristics(faults);
+            for (std::vector<struct FaultCharacteristics>::iterator it = faults.begin(); it != faults.end(); ++it) {
+                ASSERT(it->effect == INVERSION);
+                std::pair<int, int> range = getNeighborRange(it->wire, it->numWires);
+                for (int b = range.first; b < range.second; b++) {
+                    m_routerSU->collectBitflip("link", m_portId, m_vcId);
+                    errorVector ^= (1 << b);
+                }
+            }
+            break;
+        }
+
+    }
+
 
     // for the link
     if(strcmp(m_type, "out") == 0) {
         std::vector<struct FaultCharacteristics> faults;
         int flipped = 0;
-        bool fault = m_faultmodel->sampleFault();
+        bool fault = m_faultmodel->sampleFaultLink();
         if (fault) {
             //std::cout << "[" << simTime() << "," << getFullPath() << "] FAULT!!!" << std::endl;
 
