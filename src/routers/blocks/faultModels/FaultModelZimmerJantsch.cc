@@ -16,7 +16,7 @@ namespace lisnoc {
             ASSERT(int(par("example"))==3);
 
             m_p_faultLink = par("p_faultLink");
-            m_p_faultBuffer = par("p_faultBuffer");
+            m_p_faultBuffer = par("p_faultLink"); // TODO: Quick and Dirty
 
             std::vector<double> weights;
             weights.push_back(0.6768); m_P3.push_back(std::make_pair(1,1));
