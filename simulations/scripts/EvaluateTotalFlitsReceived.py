@@ -19,9 +19,12 @@ for i in files:
     total = 0
 
     for l in f:
-        m = re.search("ni\[(\d+)\].statisticsUnit,flit_network_latency:count,(\d+)", l)
+        m = re.search("ni\[(\d+)\].statisticsUnit,flit_network_latency:count,(\d+(.(\d+)e\+(\d+))?)", l)
         if m:
-            total = total + int(m.group(2))
+            if m.group(3):
+                raise(BaseException("ERROR: we need precise numbers"))
+            else:
+                total = total + int(m.group(2))
 
     print total
 
