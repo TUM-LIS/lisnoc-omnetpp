@@ -37,15 +37,16 @@ void NIStatisticsUnit::handleMessage(cMessage *msg)
     ASSERT(msg->isSelfMessage());
     delete msg;
 
-    if (int(par("id")) != 14) {
+/*    if (int(par("id")) != 14) {
         return;
-    }
+    }*/
 
     double conv = double(m_faultyPacketCount) / double(m_packetCount);
 
     m_faultProbability.collect(conv);
 
-    std::cout << simTime() << " CONVERGENCE: " << conv << " STDDEV: " << m_faultProbability.getStddev() << std::endl;
+    std::cout << simTime() << " " << getFullPath() << " CONVERGENCE: " << conv << " STDDEV: " << m_faultProbability.getStddev() << std::endl;
+
     scheduleAt(simTime() + CONV_INTERVAL, new cMessage);
 }
 

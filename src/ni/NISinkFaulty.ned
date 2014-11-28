@@ -20,5 +20,8 @@ package lisnoc.ni;
 //
 simple NISinkFaulty extends NISink
 {
+    parameters:
+    	int seperateStream = default(0);
+    
     @class(NISinkFaulty);
 }

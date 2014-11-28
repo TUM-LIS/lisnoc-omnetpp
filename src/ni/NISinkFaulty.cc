@@ -22,18 +22,19 @@ Define_Module(NISinkFaulty);
 
 void NISinkFaulty::handleIncomingFlit(LISNoCFlit *msg)
 {
-    int errorVector = msg->getErrorVector();
-    m_niSU->reportFlitArrivedFaulty(errorVector != 0);
-
-    if(errorVector != 0) {
-        msg->getPacket()->setFaulty();
-    }
-
     LISNoCFlitControlInfo* ctrlInfo = (LISNoCFlitControlInfo*) msg->getControlInfo();
-    if(ctrlInfo->getIsTail()) {
-        m_niSU->reportPacketArrivedFaulty(msg->getPacket()->isFaulty());
-    }
+    if (((ctrlInfo->getSrcId() == 0) && (ctrlInfo->getDstId() == 14)) || (int(par("seperateStream")) == 0)) {
+        int errorVector = msg->getErrorVector();
+        m_niSU->reportFlitArrivedFaulty(errorVector != 0);
 
+        if(errorVector != 0) {
+            msg->getPacket()->setFaulty();
+        }
+
+        if(ctrlInfo->getIsTail()) {
+            m_niSU->reportPacketArrivedFaulty(msg->getPacket()->isFaulty());
+        }
+    }
     NISink::handleIncomingFlit(msg);
 }
 
