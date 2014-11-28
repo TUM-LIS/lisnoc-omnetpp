@@ -43,7 +43,9 @@ void NIStatisticsUnit::handleMessage(cMessage *msg)
 
     double conv = double(m_faultyPacketCount) / double(m_packetCount);
 
-    std::cout << simTime() << " CONVERGENCE: " << conv << std::endl;
+    m_faultProbability.collect(conv);
+
+    std::cout << simTime() << " CONVERGENCE: " << conv << " STDDEV: " << m_faultProbability.getStddev() << std::endl;
     scheduleAt(simTime() + CONV_INTERVAL, new cMessage);
 }
 

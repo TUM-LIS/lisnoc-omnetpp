@@ -55,6 +55,7 @@ class NIStatisticsUnit : public cSimpleModule
 
     unsigned int m_packetCount;
     unsigned int m_faultyPacketCount;
+    cStdDev m_faultProbability;
 };
 
 } //namespace
