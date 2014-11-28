@@ -23,15 +23,18 @@ namespace lisnoc {
         ASSERT(stage == 0);
         m_p_bitFlip = par("p_bitFlip");
         FaultModelBase::initialize(stage);
+
+        m_sampleDistribution = new std::discrete_distribution<>({m_p_bitFlip,1.0 - m_p_bitFlip});
     }
 
     bool FaultModelSimple::sampleFault() {
+        static std::default_random_engine generator;
         m_currentFlipVector = 0;
 
         // TODO: bitwidth
         for (int i = 0; i < 32; i++) {
-            double sample = double(rand())/RAND_MAX;
-            if (sample <= m_p_bitFlip) {
+
+            if ((*m_sampleDistribution)(generator) == 0) {
                 m_currentFlipVector |= (1 << i);
             }
         }

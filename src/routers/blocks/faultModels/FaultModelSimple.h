@@ -18,12 +18,15 @@
 
 #include <FaultModel.h>
 
+#include <random>
+
 namespace lisnoc {
 
 class FaultModelSimple: public lisnoc::FaultModelBase {
 private:
     double m_p_bitFlip;
     unsigned int m_currentFlipVector;
+    std::discrete_distribution<> *m_sampleDistribution;
 protected:
     virtual void initialize(int stage);
 public:
