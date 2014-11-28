@@ -61,13 +61,13 @@ void RouterBufferFaulty::doTransfer() {
         int flipped = 0;
         bool fault = m_faultmodel->sampleFault();
         if (fault) {
-            std::cout << "[" << simTime() << "," << getFullPath() << "] FAULT!!!" << std::endl;
+            // std::cout << "[" << simTime() << "," << getFullPath() << "] FAULT!!!" << std::endl;
 
             m_faultmodel->sampleFaultCharacteristics(faults);
 
             for (std::vector<struct FaultCharacteristics>::iterator it = faults.begin(); it != faults.end(); ++it) {
                 std::pair<int, int> range = getNeighborRange(it->wire, it->numWires);
-                std::cout << "[" << simTime() << "," << getFullPath() << "] -> flip bits " << range.first << " to " << (range.second-1) << std::endl;
+                // std::cout << "[" << simTime() << "," << getFullPath() << "] -> flip bits " << range.first << " to " << (range.second-1) << std::endl;
                 for (int b = range.first; b < range.second; b++) {
                     errorVector ^= (1 << b);
                     flipped |= (1 << b);
@@ -83,7 +83,7 @@ void RouterBufferFaulty::doTransfer() {
             }
 
             if (m_temp_bitflip_bits[i] > 0) {
-                std::cout << "[" << simTime() << "," << getFullPath() << "] Temporal flip of bit " << i << std::endl;
+                // std::cout << "[" << simTime() << "," << getFullPath() << "] Temporal flip of bit " << i << std::endl;
                 errorVector ^= (1 << i);
                 m_temp_bitflip_bits[i]--;
             }
