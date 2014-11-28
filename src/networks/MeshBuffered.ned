@@ -23,8 +23,8 @@ import lisnoc.GlobalStatisticsUnit;
 
 network MeshBuffered {
 	parameters:
-	    int columns = default(4);
-	    int rows = default(4);
+	    int columns;
+	    int rows;
 	    int nPorts = 5;
 	    int nVCs = default(1);
 	    

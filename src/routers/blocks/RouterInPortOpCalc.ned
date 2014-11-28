@@ -19,6 +19,7 @@ simple RouterInPortOpCalc
 {
 	parameters:
     	int routerId;
+    	int columns;
     @display("i=block/dispatch");
     gates:
         input in;
