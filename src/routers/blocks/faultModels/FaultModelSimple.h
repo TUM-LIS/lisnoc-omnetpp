@@ -13,35 +13,24 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#ifndef __LISNOC_ROUTERBUFFERFAULTY_H_
-#define __LISNOC_ROUTERBUFFERFAULTY_H_
+#ifndef FAULTMODELSIMPLE_H_
+#define FAULTMODELSIMPLE_H_
 
-#include "RouterBuffer.h"
+#include <FaultModel.h>
 
 namespace lisnoc {
 
-class FaultModelBase;
-
-/**
- * TODO - Generated class
- */
-class RouterBufferFaulty : public RouterBuffer
-{
-  protected:
+class FaultModelSimple: public lisnoc::FaultModelBase {
+private:
+    double m_p_bitFlip;
+    unsigned int m_currentFlipVector;
+protected:
     virtual void initialize(int stage);
-    virtual int numInitStages() const { return 2; }
-    virtual void doTransfer();
-
-  private:
-    double m_p_bitflip_buffer;
-    double m_p_bitflip_link;
-    std::vector<int> m_temp_bitflip_bits;
-
-    FaultModelBase *m_faultmodel;
-
-    std::pair<int, int> getNeighborRange(int bit, int count);
+public:
+    virtual bool sampleFault();
+    virtual void sampleFaultCharacteristics(std::vector<struct FaultCharacteristics> &faultVector);
 };
 
-} //namespace
+} /* namespace lisnoc */
 
-#endif
+#endif /* FAULTMODELSIMPLE_H_ */

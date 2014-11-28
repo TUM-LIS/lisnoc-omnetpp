@@ -14,7 +14,10 @@
 // 
 
 #include "RouterBufferFaulty.h"
+#include "FaultModel.h"
+
 #include <cmath>
+#include <random>
 
 namespace lisnoc {
 
@@ -27,76 +30,14 @@ void RouterBufferFaulty::initialize(int stage) {
 
         m_temp_bitflip_bits.resize(32, 0);
 
+    } else if (stage == 1) {
+        m_faultmodel = FaultModelRegistry::s_getFaultModelRegistry()->getRouterFaultModel(par("routerId"));
     }
 
 
     RouterBuffer::initialize(stage);
 
-    double d = 0.6768;
-    m_P3.push_back(std::make_pair(d, std::make_pair(1,1)));
-    d += 0.1521;
-    m_P3.push_back(std::make_pair(d, std::make_pair(2,1)));
-    d += 0.0353;
-    m_P3.push_back(std::make_pair(d, std::make_pair(3,1)));
-    d += 0.0090;
-    m_P3.push_back(std::make_pair(d, std::make_pair(4,1)));
-    d += 0.0019;
-    m_P3.push_back(std::make_pair(d, std::make_pair(5,1)));
-    d += 0.0003;
-    m_P3.push_back(std::make_pair(d, std::make_pair(6,1)));
-    d += 0.0001;
-    m_P3.push_back(std::make_pair(d, std::make_pair(7,1)));
-    d += 0.0836;
-    m_P3.push_back(std::make_pair(d, std::make_pair(1,2)));
-    d += 0.0195;
-    m_P3.push_back(std::make_pair(d, std::make_pair(2,2)));
-    d += 0.0047;
-    m_P3.push_back(std::make_pair(d, std::make_pair(3,2)));
-    d += 0.0009;
-    m_P3.push_back(std::make_pair(d, std::make_pair(4,2)));
-    d += 0.0002;
-    m_P3.push_back(std::make_pair(d, std::make_pair(5,2)));
-    d += 0.0001;
-    m_P3.push_back(std::make_pair(d, std::make_pair(6,2)));
-    d += 0.0102;
-    m_P3.push_back(std::make_pair(d, std::make_pair(1,3)));
-    d += 0.0028;
-    m_P3.push_back(std::make_pair(d, std::make_pair(2,3)));
-    d += 0.0007;
-    m_P3.push_back(std::make_pair(d, std::make_pair(3,3)));
-    d += 0.0002;
-    m_P3.push_back(std::make_pair(d, std::make_pair(4,3)));
-    d += 0.0013;
-    m_P3.push_back(std::make_pair(d, std::make_pair(1,4)));
-    d += 0.0003;
-    m_P3.push_back(std::make_pair(d, std::make_pair(2,4)));
 
-}
-
-bool RouterBufferFaulty::sampleFault() {
-    // TODO: maybe more efficient with binom coeff?
-    for (int i = 0; i < 32; i++) {
-        double sample = double(rand())/RAND_MAX;
-        if (sample <= double(par("p_bitflip_link"))) {
-            return true;
-        }
-    }
-    return false;
-}
-
-// bits, time
-RouterBufferFaulty::Pentry_t RouterBufferFaulty::sampleFaultCharacteristic() {
-    double sample = double(rand())/RAND_MAX;
-
-    for (P_t::iterator it = m_P3.begin(); it != m_P3.end(); ++it) {
-        std::pair<double, Pentry_t> t = *it;
-        if (sample <= t.first) {
-            return t.second;
-        }
-    }
-
-    ASSERT(false);
-    return Pentry_t(-1,-1);
 }
 
 std::pair<int, int> RouterBufferFaulty::getNeighborRange(int bit, int count) {
@@ -123,27 +64,25 @@ void RouterBufferFaulty::doTransfer() {
 
     // for the link
     if(strcmp(m_type, "out") == 0) {
+        std::vector<struct FaultCharacteristics> faults;
         int flipped = 0;
-        //for(int i=0; i<32; i++) {
-            bool fault = sampleFault();
-            if (fault) {
-                int bit = rand() % 32;
-//                std::cout << "[" << simTime() << "," << getFullPath() << "] FAULT!!!" << std::endl;
-                RouterBufferFaulty::Pentry_t e = sampleFaultCharacteristic();
-                Pw_t w = e.first;
-                Pt_t t = e.second;
+        bool fault = m_faultmodel->sampleFault();
+        if (fault) {
+            std::cout << "[" << simTime() << "," << getFullPath() << "] FAULT!!!" << std::endl;
 
-                std::pair<int, int> range = getNeighborRange(bit, w);
-//                std::cout << "[" << simTime() << "," << getFullPath() << "] -> flip bits " << range.first << " to " << (range.second-1) << std::endl;
+            m_faultmodel->sampleFaultCharacteristics(faults);
+
+            for (std::vector<struct FaultCharacteristics>::iterator it = faults.begin(); it != faults.end(); ++it) {
+                std::pair<int, int> range = getNeighborRange(it->wire, it->numWires);
+                std::cout << "[" << simTime() << "," << getFullPath() << "] -> flip bits " << range.first << " to " << (range.second-1) << std::endl;
                 for (int b = range.first; b < range.second; b++) {
                     errorVector ^= (1 << b);
                     flipped |= (1 << b);
-                    ASSERT(t>0);
-                    m_temp_bitflip_bits[b] = t-1;
+                    ASSERT(it->duration > 0);
+                    m_temp_bitflip_bits[b] = it->duration - 1;
                 }
-                //break; // We don't need another fault..
             }
-        //}
+        }
 
         for (int i = 0; i < 32; i++) {
             if (flipped & (1 << i)) {
@@ -151,7 +90,7 @@ void RouterBufferFaulty::doTransfer() {
             }
 
             if (m_temp_bitflip_bits[i] > 0) {
-//                std::cout << "[" << simTime() << "," << getFullPath() << "] Temporal flip of bit " << i << std::endl;
+                std::cout << "[" << simTime() << "," << getFullPath() << "] Temporal flip of bit " << i << std::endl;
                 errorVector ^= (1 << i);
                 m_temp_bitflip_bits[i]--;
             }
