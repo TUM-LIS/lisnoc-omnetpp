@@ -35,12 +35,12 @@ public:
 private:
     int m_maxfill;
     cMessage m_timerMsg;
-
+  protected:
     RouterStatisticsUnit* m_routerSU;
 
     int m_portId;
     int m_vcId;
-  protected:
+
     virtual void finish();
     virtual int numInitStages() const { return 2; }
     virtual void initialize(int stage);
