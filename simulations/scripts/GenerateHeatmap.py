@@ -40,4 +40,4 @@ for i in files:
     for idx in heatcollect.keys():
         heat[idx] = sum(heatcollect[idx])/len(heatcollect[idx])
 
-    print heat
+    print i, heat

@@ -35,5 +35,5 @@ for i in files:
     net = [a for a in net if a > 0]
     total = [a for a in total if a > 0]
 
-    print sum(acc)/len(acc),sum(net)/len(net),sum(total)/len(total)
+    print i, sum(acc)/len(acc),sum(net)/len(net),sum(total)/len(total)
 
