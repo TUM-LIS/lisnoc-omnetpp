@@ -25,8 +25,12 @@ namespace lisnoc {
  */
 class NISinkFaulty : public NISink
 {
+  private:
+    int m_seperateStream;
   protected:
     virtual void handleIncomingFlit(LISNoCFlit *msg);
+  public:
+    virtual void initialize(int stage);
 };
 
 } //namespace

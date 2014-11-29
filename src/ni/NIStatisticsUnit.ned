@@ -22,4 +22,5 @@ simple NIStatisticsUnit
 {
     parameters:
         int id;
+        int seperateStream;
 }

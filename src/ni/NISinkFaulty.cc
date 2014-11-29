@@ -20,10 +20,21 @@ namespace lisnoc {
 
 Define_Module(NISinkFaulty);
 
+void NISinkFaulty::initialize(int stage) {
+    if (stage == 0) {
+        m_seperateStream = par("seperateStream");
+    }
+
+    NISink::initialize(stage);
+}
+
+
 void NISinkFaulty::handleIncomingFlit(LISNoCFlit *msg)
 {
     LISNoCFlitControlInfo* ctrlInfo = (LISNoCFlitControlInfo*) msg->getControlInfo();
-    if (((ctrlInfo->getSrcId() == 0) && (ctrlInfo->getDstId() == 60)) || (int(par("seperateStream")) == 0)) {
+
+    if ((m_seperateStream == -1) ||
+            ((ctrlInfo->getSrcId() == 0) && (ctrlInfo->getDstId() == m_seperateStream))) {
         int errorVector = msg->getErrorVector();
         m_niSU->reportFlitArrivedFaulty(errorVector != 0);
 

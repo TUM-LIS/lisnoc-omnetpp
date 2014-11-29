@@ -29,7 +29,11 @@ void NIStatisticsUnit::initialize()
     m_packetCount = 0;
     m_faultyPacketCount = 0;
 
-    scheduleAt(CONV_INTERVAL, new cMessage);
+    m_seperateStream = par("seperateStream");
+
+    if ((m_seperateStream == -1) || (m_seperateStream == int(par("id")))) {
+        scheduleAt(CONV_INTERVAL, new cMessage);
+    }
 }
 
 void NIStatisticsUnit::handleMessage(cMessage *msg)
