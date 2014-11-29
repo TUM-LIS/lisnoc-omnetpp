@@ -20,6 +20,12 @@ if __name__=="__main__":
     if len(sys.argv) < 2:
         print "Usage: RunParallel.py <config>"
         exit(1)
+
+    runfrom = None
+    runto = None
+    if len(sys.argv) > 3:
+        runfrom = int(sys.argv[2])
+        runto = int(sys.argv[3])
         
     config = sys.argv[1]
     out = subprocess.check_output("../src/lisnoc -n .:../src -x {config}".format(config=config), shell=True)
@@ -36,7 +42,16 @@ if __name__=="__main__":
     os.mkdir(resultdir)
     subprocess.call("cp omnetpp.ini {0}".format(resultdir), shell=True)
 
-    for r in range(runs):
+    if runto and runs < runto:
+        print "(WARN) runto exceeeds runs, changed"
+        runto = runs - 1
+
+    if runto is not None:
+        runs = range(runfrom, runto + 1)
+    else:
+        runs = range(runs)
+
+    for r in runs:
         job = {}
         job["config"] = config
         job["result-dir"] = resultdir
