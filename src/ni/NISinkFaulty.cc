@@ -23,7 +23,7 @@ Define_Module(NISinkFaulty);
 void NISinkFaulty::handleIncomingFlit(LISNoCFlit *msg)
 {
     LISNoCFlitControlInfo* ctrlInfo = (LISNoCFlitControlInfo*) msg->getControlInfo();
-    if (((ctrlInfo->getSrcId() == 0) && (ctrlInfo->getDstId() == 14)) || (int(par("seperateStream")) == 0)) {
+    if (((ctrlInfo->getSrcId() == 0) && (ctrlInfo->getDstId() == 60)) || (int(par("seperateStream")) == 0)) {
         int errorVector = msg->getErrorVector();
         m_niSU->reportFlitArrivedFaulty(errorVector != 0);
 
