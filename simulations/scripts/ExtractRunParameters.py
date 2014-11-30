@@ -46,7 +46,7 @@ def extract(files):
         run.id = m.group(2)
 
         for l in f:
-            m = re.search("attr iterationvars \"(.*)\"", l)
+            m = re.search("attr iterationvars (\".*\"|\$.*)", l)
             if m:
                 p = {}
                 its = m.group(1).split(',')
