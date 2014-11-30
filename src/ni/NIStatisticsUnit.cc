@@ -41,10 +41,6 @@ void NIStatisticsUnit::handleMessage(cMessage *msg)
     ASSERT(msg->isSelfMessage());
     delete msg;
 
-/*    if (int(par("id")) != 14) {
-        return;
-    }*/
-
     double conv = double(m_faultyPacketCount) / double(m_packetCount);
 
     m_faultProbability.collect(conv);
