@@ -39,7 +39,7 @@ void NISource::initialize()
 
 void NISource::genPacket()
 {
-    int numflits = 8;
+    int numflits = par("flitsPerPacket");
     int dstId = par("dstId");
 
     LISNoCPacket *packet = new LISNoCPacket(m_nextPacketId);

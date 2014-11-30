@@ -28,6 +28,7 @@ simple NISource
         volatile int initialdelay = default(0);
         volatile int genDelay = default(100);
         int abortAccessLatency = default(1000);
+        volatile int flitsPerPacket = default(8);
     @display("i=block/source");
     gates:
         output out[nVCs];
