@@ -27,8 +27,8 @@ private:
     double m_p_bitFlipLink;
     double m_p_bitFlipBuffer;
     unsigned int m_currentFlipVector;
-    std::discrete_distribution<> *m_sampleDistributionLink;
-    std::discrete_distribution<> *m_sampleDistributionBuffer;
+    std::discrete_distribution<int64_t> *m_sampleDistributionLink;
+    std::discrete_distribution<int64_t> *m_sampleDistributionBuffer;
 protected:
     virtual void initialize(int stage);
 public:

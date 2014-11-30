@@ -39,9 +39,9 @@ namespace lisnoc {
             weights.push_back(0.0013); m_P3.push_back(std::make_pair(1,4));
             weights.push_back(0.0003); m_P3.push_back(std::make_pair(2,4));
 
-            m_sampleFaultDistributionLink = new std::discrete_distribution<>({m_p_faultLink, 1.0 - m_p_faultLink});
-            m_sampleFaultDistributionBuffer = new std::discrete_distribution<>({m_p_faultBuffer, 1.0 - m_p_faultBuffer});
-            m_sampleCharacteristicDistribution = new std::discrete_distribution<>(weights.begin(), weights.end());
+            m_sampleFaultDistributionLink = new std::discrete_distribution<int64_t>({m_p_faultLink, 1.0 - m_p_faultLink});
+            m_sampleFaultDistributionBuffer = new std::discrete_distribution<int64_t>({m_p_faultBuffer, 1.0 - m_p_faultBuffer});
+            m_sampleCharacteristicDistribution = new std::discrete_distribution<int64_t>(weights.begin(), weights.end());
         }
 
 

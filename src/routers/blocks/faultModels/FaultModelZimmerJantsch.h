@@ -25,9 +25,9 @@ private:
     double m_p_faultLink;
     double m_p_faultBuffer;
 
-    std::discrete_distribution<> *m_sampleFaultDistributionLink;
-    std::discrete_distribution<> *m_sampleFaultDistributionBuffer;
-    std::discrete_distribution<> *m_sampleCharacteristicDistribution;
+    std::discrete_distribution<int64_t> *m_sampleFaultDistributionLink;
+    std::discrete_distribution<int64_t> *m_sampleFaultDistributionBuffer;
+    std::discrete_distribution<int64_t> *m_sampleCharacteristicDistribution;
 
 protected:
     virtual void initialize(int stage);

@@ -24,8 +24,8 @@ namespace lisnoc {
         m_p_bitFlipLink = par("p_bitFlipLink");
         m_p_bitFlipBuffer = par("p_bitFlipBuffer");
 
-        m_sampleDistributionLink = new std::discrete_distribution<>({m_p_bitFlipLink, 1.0 - m_p_bitFlipLink});
-        m_sampleDistributionBuffer = new std::discrete_distribution<>({m_p_bitFlipBuffer, 1.0 - m_p_bitFlipBuffer});
+        m_sampleDistributionLink = new std::discrete_distribution<int64_t>({m_p_bitFlipLink, 1.0 - m_p_bitFlipLink});
+        m_sampleDistributionBuffer = new std::discrete_distribution<int64_t>({m_p_bitFlipBuffer, 1.0 - m_p_bitFlipBuffer});
 
         FaultModelBase::initialize(stage);
     }
