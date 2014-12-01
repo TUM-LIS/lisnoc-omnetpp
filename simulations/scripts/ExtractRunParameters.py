@@ -23,14 +23,32 @@ class Config:
         self.name = None
         self.runs = None
 
-    def addRuns(self, runs):
+    def addRuns(self, runs = None):
+        if runs is None:
+            files = []
+            for l in os.listdir("."):
+                if re.match("(\w+)-(\d+).sca", l):
+                    files.append(l)
+            runs = extract(files)
+
+        self.runs = runs
+        
         if self.name is None:
-            self.name = runs[0].config
-            self.parameters = runs[1].parameters.keys()
+            self.name = self.runs[0].config
+            self.parameters = self.runs[0].parameters.keys()
 
     def getRuns(self, fixed):
         free = [p for p in self.parameters if p not in fixed.keys()]
-        print free        
+        runs = {}
+        for r in self.runs:
+            matches = True
+            for f in fixed.keys():
+                if r.parameters[f] != fixed[f]:
+                    matches = False
+            if matches:
+                freeval = r.parameters[free[0]]
+                runs[freeval] = r
+        return runs
 
 def extract(files):
     runs = []
@@ -46,12 +64,15 @@ def extract(files):
         run.id = m.group(2)
 
         for l in f:
-            m = re.search("attr iterationvars (\".*\"|\$.*)", l)
+            m = re.search("attr iterationvars (\"(.*)\"|\$.*)", l)
             if m:
+                iterations = [m.group(1)]
+                if m.group(2):
+                    iterations = m.group(2).split(',')
+                    iterations = [i.strip() for i in iterations]
+
                 p = {}
-                its = m.group(1).split(',')
-                its = [i.strip() for i in its]
-                for it in its:
+                for it in iterations:
                     m = re.search("\$(.*)=(.*)", it)
                     if m:
                         p[m.group(1)] = m.group(2)
