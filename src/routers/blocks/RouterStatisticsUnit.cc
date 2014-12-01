@@ -69,9 +69,9 @@ void RouterStatisticsUnit::collectBufferLatency(const char *type, int port, int 
 }
 
 void RouterStatisticsUnit::collectFault(const char* type, int port, int vc) {
-    if (strcmp("inBuffer", type) == 0) {
+    if (strcmp("in", type) == 0) {
         m_inBufferFault[port][vc].collect(1);
-    } else if (strcmp("outBuffer", type) == 0) {
+    } else if (strcmp("out", type) == 0) {
         m_outBufferFault[port][vc].collect(1);
     } else if (strcmp("link", type) == 0){
         m_linkFault[port][vc].collect(1);
@@ -81,9 +81,9 @@ void RouterStatisticsUnit::collectFault(const char* type, int port, int vc) {
 }
 
 void RouterStatisticsUnit::collectBitflip(const char* type, int port, int vc) {
-    if (strcmp("inBuffer", type) == 0) {
+    if (strcmp("in", type) == 0) {
         m_inBufferBitflip[port][vc].collect(1);
-    } else if (strcmp("outBuffer", type) == 0) {
+    } else if (strcmp("out", type) == 0) {
         m_outBufferBitflip[port][vc].collect(1);
     } else if (strcmp("link", type) == 0){
         m_linkBitflip[port][vc].collect(1);

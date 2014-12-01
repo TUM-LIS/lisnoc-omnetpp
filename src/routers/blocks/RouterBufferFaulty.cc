@@ -63,12 +63,15 @@ void RouterBufferFaulty::doTransfer() {
         bool fault = m_faultmodel->sampleFaultBuffer();
 
         if (fault) {
+            m_routerSU->collectFault(par("type"), m_portId, m_vcId);
+
             m_faultmodel->sampleFaultCharacteristics(faults);
+
             for (std::vector<struct FaultCharacteristics>::iterator it = faults.begin(); it != faults.end(); ++it) {
                 ASSERT(it->effect == INVERSION);
                 std::pair<int, int> range = getNeighborRange(it->wire, it->numWires);
                 for (int b = range.first; b < range.second; b++) {
-                    m_routerSU->collectBitflip("link", m_portId, m_vcId);
+                    m_routerSU->collectBitflip(par("type"), m_portId, m_vcId);
                     errorVector ^= (1 << b);
                 }
             }
