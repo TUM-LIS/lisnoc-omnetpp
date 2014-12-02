@@ -49,7 +49,7 @@ namespace lisnoc {
     }
 
     bool FaultModelZimmerJantsch::sampleFaultLink() {
-        static std::default_random_engine generator;
+        static std::mt19937_64  generator;
 
         for (int i = 0; i < 32; i++) {
             if ((*m_sampleFaultDistributionLink)(generator) == 0) {
@@ -60,7 +60,7 @@ namespace lisnoc {
     }
 
     bool FaultModelZimmerJantsch::sampleFaultBuffer() {
-        static std::default_random_engine generator;
+        static std::mt19937_64 generator;
 
         for (int i = 0; i < 32; i++) {
             if ((*m_sampleFaultDistributionBuffer)(generator) == 0) {
@@ -71,7 +71,7 @@ namespace lisnoc {
     }
 
     void FaultModelZimmerJantsch::sampleFaultCharacteristics(std::vector<struct FaultCharacteristics> &faultVector) {
-        static std::default_random_engine generator;
+        static std::mt19937_64 generator;
         faultVector.clear();
 
         unsigned int sampleIndex = (*m_sampleCharacteristicDistribution)(generator);

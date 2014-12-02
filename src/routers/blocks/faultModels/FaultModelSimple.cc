@@ -31,7 +31,7 @@ namespace lisnoc {
     }
 
     bool FaultModelSimple::sampleFaultLink() {
-        static std::default_random_engine generator;
+        static std::mt19937_64 generator;
         m_currentFlipVector = 0;
 
         // TODO: bitwidth
@@ -45,7 +45,7 @@ namespace lisnoc {
     }
 
     bool FaultModelSimple::sampleFaultBuffer() {
-        static std::default_random_engine generator;
+        static std::mt19937_64 generator;
         m_currentFlipVector = 0;
 
         // TODO: bitwidth
