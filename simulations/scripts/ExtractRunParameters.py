@@ -17,6 +17,9 @@ class Run:
     def getCsvFilename(self):
         return "{0}-{1}.csv".format(self.config, self.id)
 
+    def getStdoutFilename(self):
+        return "{0}-{1}.stdout".format(self.config, self.id)
+
 class Config:
     def __init__(self):
         self.parameters = []
@@ -37,7 +40,7 @@ class Config:
             self.name = self.runs[0].config
             self.parameters = self.runs[0].parameters.keys()
 
-    def getRuns(self, fixed):
+    def getRuns(self, fixed = {}):
         free = [p for p in self.parameters if p not in fixed.keys()]
         runs = {}
         for r in self.runs:

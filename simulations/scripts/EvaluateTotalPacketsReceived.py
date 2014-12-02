@@ -26,5 +26,5 @@ for i in files:
             else:
                 total = total + int(m.group(2))
 
-    print total
+    print i,total
 

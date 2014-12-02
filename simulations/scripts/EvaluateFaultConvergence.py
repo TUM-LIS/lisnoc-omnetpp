@@ -3,36 +3,36 @@
 import sys, re, os
 from matplotlib import pyplot
 
-files = []
+def evaluate(file):
+    f = open(file)
 
-if len(sys.argv) < 2:
-    for l in os.listdir("."):
-        if re.match("(\w+)-(\d+).stdout", l):
-            files.append(l)
-else:
-    files = sys.argv[1:]
-
-files.sort()
-
-conv = []
-
-for i in files:
-    f = open(i)
-
-    results = [0]
+    mean = [0]
+    stddev = [0, 0]
 
     for l in f:
-        m = re.search("\d+(\.\d+)? CONVERGENCE: (\d(\.\d+)?(e-\d+)?)", l)
+        m = re.search("\d+(\.\d+)? .* CONVERGENCE: (\d(\.\d+)?(e-\d+)?) STDDEV: (\d(\.\d+)?(e-\d+)?)", l)
         if m:
-            results.append(m.group(2))
+            if m.group(2) != "-nan":
+                mean.append(m.group(2))
+            if m.group(5) != "-nan":
+                stddev.append(m.group(5))
 
-    conv.append(results)
+    return { "mean":  mean, "stddev": stddev }
 
-print conv
+if __name__ == "__main__":
+    files = []
 
-for c in conv:
-    pyplot.plot(c)
-    pyplot.show()
+    if len(sys.argv) < 2:
+        for l in os.listdir("."):
+            if re.match("(\w+)-(\d+).stdout", l):
+                files.append(l)
+    else:
+        files = sys.argv[1:]
+
+    files.sort()
+
+    for i in files:
+        print i, extract(i)
 
 
 
