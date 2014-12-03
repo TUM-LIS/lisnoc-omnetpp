@@ -58,7 +58,11 @@ if __name__=="__main__":
         job["run"] = r
         jobs.append(job)
 
-    pool = Pool()
+    pool = None
+    if "LISNOC_RUNPARALLEL" in os.environ:
+        pool = Pool(os.environ["LISNOC_RUNPARALLEL"])
+    else:
+        pool = Pool()
     try:
         pool.map(execute, jobs)
     except KeyboardInterrupt:
