@@ -22,6 +22,7 @@ simple RouterBuffer
         int routerId;
         int portId;
         int vcId;
+        int columns;
         
     @display("i=block/queue");
     

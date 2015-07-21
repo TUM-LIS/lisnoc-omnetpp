@@ -30,6 +30,14 @@ class LISNoCFlitControlInfo {
 	bool isTail;    
 	int srcId;
   	int dstId;
+  	int dst2Id;
+  	int dst3Id;
+  	int src2Id;
+  	bool MXaIS;
+  	bool iX;
+  	bool MXaDst;
+  	bool DCNC;
+  	bool Split;
 };
 
 packet LISNoCFlit {

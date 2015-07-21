@@ -53,6 +53,7 @@ module RouterBuffered
    		}
    		switch: RouterSwitch {
    		 	parameters:
+   		 	    routerId = id;
    		 	    nPorts = nPorts;
    		 	    nVCs = nVCs;   
    		}

@@ -14,6 +14,7 @@
 // 
 
 #include "RouterSwitch.h"
+using namespace std;
 
 namespace lisnoc {
 
@@ -23,14 +24,18 @@ void RouterSwitch::initialize()
 {
     m_nVCs = par("nVCs");
     m_nPorts = par("nPorts");
+    m_flitsperpacket = par("flitsPerPacket");
 
     m_outputArbiters.resize(m_nPorts);
     m_outputRequests.resize(m_nPorts);
     m_inputRequests.resize(m_nPorts);
+    m_data_to_XOR.resize(m_nPorts);
+
     for (int p = 0; p < m_nPorts; p++) {
         m_outputArbiters[p].resize(m_nVCs);
         m_inputRequests[p].resize(m_nVCs, NULL);
         m_outputRequests[p].resize(m_nVCs, NULL);
+        m_data_to_XOR[p].resize(m_flitsperpacket);
 
         for (int v = 0; v < m_nVCs; v++) {
             Arbiter *arb = new Arbiter(m_nPorts, p, v);
@@ -39,6 +44,16 @@ void RouterSwitch::initialize()
     }
 
     m_selfSignal = new cMessage;
+
+    for (int i=0; i<5 ; i++)
+    {
+        for (int j=0; j<4 ; j++)
+        {
+            SrcDest[i][j]=-1;
+        }
+    }
+
+
 }
 
 RouterSwitch::Arbiter::Arbiter(int numports, int port, int vc)
@@ -221,8 +236,106 @@ void RouterSwitch::handleMessageFlit(LISNoCFlit *msg)
     LISNoCFlitControlInfo *controlInfo = (LISNoCFlitControlInfo*) msg->getControlInfo();
     int oport = controlInfo->getOutputPort();
     int ovc = controlInfo->getVC();
+    int MXaIS = controlInfo->getMXaIS();
+    int Rout=par("routerId");
+    int col=par("columns");
+    int flitid = controlInfo->getFlitId();
+    //int placed = -1;
 
+    int src1 = controlInfo->getSrcId();
+    int src2 = controlInfo->getSrc2Id();
+    int dst1 = controlInfo->getDst2Id();
+    int dst2 = controlInfo->getDst3Id();
+
+    int src1PosX = src1%col;
+    int src1PosY = src1/col;
+
+    int src2PosX = src2%col;
+    int src2PosY = src2/col;
+
+    int ISPosX = floor((src1PosX + src2PosX)/2);
+    int ISPosY = floor((src1PosY + src2PosY)/2);
+
+    int ISId = (col*ISPosY)+ISPosX;
+
+    if (MXaIS == 1 && Rout == ISId)
+    {
+        //int match=0;
+        for(int i=0; i<5; i++){
+            if(SrcDest[i][0]!=-1)
+                if(SrcDest[i][0]==src2 && SrcDest[i][1]==src1 && SrcDest[i][2]==dst2 && SrcDest[i][3]==dst1)
+                {
+                    //placed = i;
+                    //match++;
+                    for(int k=0; k<4 ; k++){
+                        msg->setData(k,unsigned(msg->getData(k)^m_data_to_XOR[i][flitid]->getData(k)));
+                        cout << unsigned(msg->getData(k)) <<endl;
+                        controlInfo->setIX(true);
+                    }
+                    if(controlInfo->getIsTail()==1){
+                        SrcDest[i][0]=-1;
+                    }
+                    send(msg, "out", oport*m_nVCs+ovc);
+                    return;
+                }
+        }
+
+
+        if(controlInfo->getIsHead())
+        {
+            //if (match==0)
+            //{
+                for (int i=0; i<5; i++){
+                    if(SrcDest[i][0]==-1){
+                        SrcDest[i][0]=src1;
+                        SrcDest[i][1]=src2;
+                        SrcDest[i][2]=dst1;
+                        SrcDest[i][3]=dst2;
+
+                        m_data_to_XOR[i][flitid]=msg;
+                        break;
+                    }
+                }
+            //}
+            //else{
+                    //TODO: start xoring with corresponding packet!!
+            //}
+        } else {            // this is not head flit
+            //if (match==0){  // Add to the already stored previous flits of this packet
+                for (int i=0; i<5; i++){
+                    if (SrcDest[i][0]==src1 && SrcDest[i][1]==src2 && SrcDest[i][2]==dst1 && SrcDest[i][3]==dst2){
+                        m_data_to_XOR[i][flitid]=msg;
+                        break;
+                    }
+                }
+            //}
+            //else{
+                //TODO: start xoring with corresponding packet!!
+            //}
+        }
+/*        if (controlInfo->getIsTail()==1)
+            {
+                for (int i=0; i<5; i++){
+                    for (int j=0; j<4; j++)
+                    {
+                    cout<< SrcDest[i][j]<< ", ";
+                    }
+                    cout<<endl;
+                }
+
+                for(int i = 0; i < m_flitsperpacket; i++){
+                    int datasize = m_data_to_XOR[0][i]->getDataArraySize();
+                    //cout<<"Datasize =" <<datasize<<endl;
+                    for(int j=0; j<datasize; j++){
+                        cout<<"Data = " <<unsigned(m_data_to_XOR[0][i]->getData(j))<<endl;
+                    }
+                }
+                ASSERT(0);
+            }*/
+    }
+    else{
     send(msg, "out", oport*m_nVCs+ovc);
+    }
 }
 
 void RouterSwitch::handleMessage(cMessage *msg)

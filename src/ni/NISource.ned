@@ -25,10 +25,16 @@ simple NISource
         int nVCs = default(1);
         int id;
         volatile int dstId = default(-1);
+        volatile int dst2Id = default(-1);
+        volatile int dst3Id = default(-1);
+        volatile int src2Id = default(-1);
+        volatile bool DCNC = default(false);
+        volatile bool Split = default(false);
         volatile int initialdelay = default(0);
         volatile int genDelay = default(100);
         int abortAccessLatency = default(1000);
-        volatile int flitsPerPacket = default(8);
+        volatile int flitsPerPacket = default(3);
+        int columns;
     @display("i=block/source");
     gates:
         output out[nVCs];

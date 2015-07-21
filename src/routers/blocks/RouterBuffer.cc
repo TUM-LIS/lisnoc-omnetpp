@@ -16,6 +16,7 @@
 #include "RouterBuffer.h"
 #include "RouterStatisticsUnit.h"
 #include <GlobalStatisticsUnit.h>
+#include <stdio.h>
 
 namespace lisnoc {
 
@@ -43,11 +44,189 @@ void RouterBuffer::initialize(int stage)
 
 void RouterBuffer::handleIncomingFlit(LISNoCFlit *msg)
 {
-    ASSERT(m_buffer.getLength() < m_maxfill);
+    ASSERT(m_buffer.getLength() < m_maxfill-1);
+    //int Rout=par("routerId");
+    if(strcmp("out",m_type)==0){
+        m_buffer.insert(msg);
+        cancelEvent(&m_timerMsg);
+        triggerSelf(1, &m_timerMsg);
+    }
 
-    m_buffer.insert(msg);
-    cancelEvent(&m_timerMsg);
-    triggerSelf(1, &m_timerMsg);
+    if(strcmp("in",m_type)==0){
+        LISNoCFlitControlInfo *controlInfo = (LISNoCFlitControlInfo *) msg->getControlInfo();
+
+        LISNoCFlit *flit = new LISNoCFlit;
+        LISNoCFlitControlInfo *controlInfo2 = new LISNoCFlitControlInfo;
+        flit->setControlInfo(controlInfo2);
+
+        int col = par("columns");
+        int routerId = par("routerId");
+
+        //std::cout<<"Router = "<<Rout<<" ,Data array size = "<<msg->getDataArraySize()<<std::endl;
+        //    if(msg->getDataArraySize()!=0)
+        //        std::cout<<" ,Data= "<<msg->getData(msg->getDataArraySize())<<std::endl;
+
+        bool Split = controlInfo->getSplit();
+        bool iX = controlInfo->getIX();
+        if (iX==false){
+            if (Split==true){
+                m_buffer.insert(msg);
+                cancelEvent(&m_timerMsg);
+                triggerSelf(1, &m_timerMsg);
+            }
+            else{
+                int dstId = controlInfo->getDstId();
+                int dst2Id = controlInfo->getDst2Id();
+                int ISId = controlInfo->getDst3Id();
+                //int col = par("columns");
+                //int routerId = par("routerId");
+                bool DCNC = controlInfo->getDCNC();
+
+                int dst1PosX = dstId%col;
+                int dst2PosX = dst2Id%col;
+                int routerPosX = routerId%col;
+
+                if(((dst1PosX < routerPosX) & (dst2PosX < routerPosX)) | ((dst1PosX > routerPosX) & (dst2PosX > routerPosX))){
+                    m_buffer.insert(msg);
+                    cancelEvent(&m_timerMsg);
+                    triggerSelf(1, &m_timerMsg);
+                }
+                else{
+                    if(DCNC==false){
+                        controlInfo->setSplit(true);
+                        controlInfo2->setSplit(true);
+
+                        controlInfo->setDst2Id(-1);
+                        controlInfo2->setDst2Id(-1);
+                        controlInfo2->setDstId(dst2Id);
+
+                        controlInfo2->setVC(0);
+                        controlInfo2->setMXaIS(false);
+                        controlInfo2->setIX(false);
+                        controlInfo2->setMXaDst(false);
+                        controlInfo2->setDCNC(false);
+                        controlInfo2->setSrcId(controlInfo->getSrcId());
+                        controlInfo2->setPacketId(controlInfo->getPacketId());
+                        flit->setBitLength(32);
+                        flit->setByteLength(4);
+                        controlInfo2->setFlitId(controlInfo->getFlitId());
+                        controlInfo2->setIsHead(controlInfo->getIsHead());
+                        controlInfo2->setIsTail(controlInfo->getIsTail());
+                        flit->setGenerationTime(msg->getGenerationTime());
+                        flit->setPacket(msg->getPacket());
+
+                        m_buffer.insert(msg);
+
+                        flit->setDataArraySize(msg->getDataArraySize());
+
+                        for(unsigned int d = 0; d < msg->getDataArraySize(); d++){
+                            flit->setData(d,msg->getData(d));
+                        }
+
+                        m_buffer.insert(flit);
+                        cancelEvent(&m_timerMsg);
+                        triggerSelf(1, &m_timerMsg);
+                    }
+                    else{
+                        controlInfo->setSplit(true);
+                        controlInfo2->setSplit(true);
+
+                        controlInfo->setDstId(dstId);
+                        controlInfo->setDst2Id(-1);
+                        controlInfo->setDst3Id(-1);
+
+                        controlInfo->setMXaIS(false);
+                        controlInfo->setIX(false);
+                        controlInfo->setMXaDst(true);
+
+                        controlInfo2->setDstId(ISId);
+                        controlInfo2->setDst2Id(dstId);
+                        controlInfo2->setDst3Id(dst2Id);
+
+                        controlInfo2->setMXaIS(true);
+                        controlInfo2->setIX(false);
+                        controlInfo2->setMXaDst(true);
+
+
+
+
+                        controlInfo2->setVC(0);
+                        controlInfo2->setDCNC(true);
+                        controlInfo2->setSrcId(controlInfo->getSrcId());
+                        controlInfo2->setPacketId(controlInfo->getPacketId());
+                        flit->setBitLength(32);
+                        flit->setByteLength(4);
+                        controlInfo2->setFlitId(controlInfo->getFlitId());
+                        controlInfo2->setIsHead(controlInfo->getIsHead());
+                        controlInfo2->setIsTail(controlInfo->getIsTail());
+                        controlInfo2->setSrc2Id(controlInfo->getSrc2Id());
+                        flit->setGenerationTime(msg->getGenerationTime());
+                        flit->setPacket(msg->getPacket());
+
+
+
+                        m_buffer.insert(msg);
+
+                        flit->setDataArraySize(msg->getDataArraySize());
+
+                        for(unsigned int d = 0; d < msg->getDataArraySize(); d++){
+                            flit->setData(d,msg->getData(d));
+                        }
+                        m_buffer.insert(flit);
+                        cancelEvent(&m_timerMsg);
+                        triggerSelf(1, &m_timerMsg);
+                    }
+                }
+            }
+        }
+        else{
+            int dstId = controlInfo->getDstId();
+            if (dstId!=routerId){
+                m_buffer.insert(msg);
+                cancelEvent(&m_timerMsg);
+                triggerSelf(1, &m_timerMsg);
+            }
+            else{
+                controlInfo2->setSplit(true);
+
+                controlInfo2->setVC(0);
+                controlInfo2->setMXaIS(true);
+                controlInfo2->setIX(false);
+                controlInfo->setIX(false);
+                controlInfo2->setMXaDst(true);
+                controlInfo2->setDCNC(true);
+                controlInfo2->setSrcId(controlInfo->getSrcId());
+                controlInfo2->setPacketId(controlInfo->getPacketId());
+                flit->setBitLength(32);
+                flit->setByteLength(4);
+                controlInfo2->setFlitId(controlInfo->getFlitId());
+                controlInfo2->setIsHead(controlInfo->getIsHead());
+                controlInfo2->setIsTail(controlInfo->getIsTail());
+                flit->setGenerationTime(msg->getGenerationTime());
+                flit->setPacket(msg->getPacket());
+
+
+
+                flit->setDataArraySize(msg->getDataArraySize());
+
+                for(unsigned int d = 0; d < msg->getDataArraySize(); d++){
+                    flit->setData(d,msg->getData(d));
+                }
+
+
+                controlInfo->setDstId(controlInfo->getDst2Id());
+                controlInfo2->setDstId(controlInfo->getDst3Id());
+                controlInfo->setDst2Id(-1);
+                controlInfo->setDst3Id(-1);
+                controlInfo2->setDst2Id(-1);
+                controlInfo2->setDst3Id(-1);
+                m_buffer.insert(msg);
+                m_buffer.insert(flit);
+                cancelEvent(&m_timerMsg);
+                triggerSelf(1, &m_timerMsg);
+            }
+        }
+    }
 }
 
 void RouterBuffer::trySend()
@@ -83,7 +262,7 @@ void RouterBuffer::doTransfer()
 
 bool RouterBuffer::isRequestGranted(LISNoCFlowControlRequest *msg)
 {
-    return (m_buffer.getLength() < m_maxfill);
+    return (m_buffer.getLength() < m_maxfill-1);
 }
 
 void RouterBuffer::finish() {
