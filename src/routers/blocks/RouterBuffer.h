@@ -53,6 +53,8 @@ private:
 
     const char *m_type;
     cQueue m_buffer;
+    LISNoCFlit *flit;
+    LISNoCFlitControlInfo *controlInfo2;
 };
 
 } //namespace

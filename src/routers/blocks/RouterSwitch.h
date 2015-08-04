@@ -32,11 +32,13 @@ private:
     int m_nVCs;
     int m_nPorts;
     cMessage *m_selfSignal;
+    int m_flitsperpacket;
 
     class Arbiter {
         int m_port;
         int m_vc;
         int m_nPorts;
+
         std::vector<bool> m_requests;
         std::vector<bool> m_requestsIsHead;
         std::vector<bool> m_requestsIsTail;
@@ -60,6 +62,8 @@ private:
     std::vector<std::vector<LISNoCFlowControlRequest*> > m_outputRequests;
 
     std::vector<std::vector<LISNoCFlitControlInfo*> > m_inputRequests;
+    std::vector<std::vector<LISNoCFlit*> > m_data_to_XOR;
+    int SrcDest [5][4];                  //for each port save 2 sources and destinations for XOR
 
   protected:
     virtual void initialize();

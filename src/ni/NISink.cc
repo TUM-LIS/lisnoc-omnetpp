@@ -49,6 +49,12 @@ void NISink::handleIncomingFlit(LISNoCFlit *msg)
 
     LISNoCFlitControlInfo *ctrlInfo = (LISNoCFlitControlInfo*) msg->getControlInfo();
 
+    //int id = par("id");
+    //std::cout<<"Sink = "<<id<<" ,Data array size = "<<msg->getDataArraySize()<<std::endl;
+     //   if(msg->getDataArraySize()!=0)
+       //     std::cout<<" ,Data= "<<msg->getData(msg->getDataArraySize())<<std::endl;
+
+
     if(ctrlInfo->getIsTail()) {
         delete msg->getPacket();
     }
