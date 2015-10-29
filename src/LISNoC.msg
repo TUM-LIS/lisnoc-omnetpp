@@ -32,12 +32,16 @@ class LISNoCFlitControlInfo {
   	int dstId;
   	int dst2Id;
   	int dst3Id;
+  	int dst4Id_ID;
   	int src2Id;
   	bool MXaIS;
   	bool iX;
   	bool MXaDst;
   	bool DCNC;
   	bool Split;
+  	bool UC;
+  	int HopCount;
+  	//int Algo;
 };
 
 packet LISNoCFlit {
@@ -45,6 +49,8 @@ packet LISNoCFlit {
   	uint8_t data[];
   	simtime_t generationTime;
   	simtime_t sendTime;
+  	simtime_t generationTime2;
+  	simtime_t sendTime2;
   	int errorVector;
 }
 

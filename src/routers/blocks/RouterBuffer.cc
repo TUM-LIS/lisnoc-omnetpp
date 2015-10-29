@@ -22,6 +22,7 @@ namespace lisnoc {
 
 Define_Module(RouterBuffer);
 
+
 void RouterBuffer::initialize(int stage)
 {
     if(stage == 0) {
@@ -45,7 +46,6 @@ void RouterBuffer::initialize(int stage)
 void RouterBuffer::handleIncomingFlit(LISNoCFlit *msg)
 {
     ASSERT(m_buffer.getLength() < m_maxfill-1);
-    //int Rout=par("routerId");
     if(strcmp("out",m_type)==0){
         m_buffer.insert(msg);
         cancelEvent(&m_timerMsg);
@@ -55,16 +55,8 @@ void RouterBuffer::handleIncomingFlit(LISNoCFlit *msg)
     if(strcmp("in",m_type)==0){
         LISNoCFlitControlInfo *controlInfo = (LISNoCFlitControlInfo *) msg->getControlInfo();
 
-        //LISNoCFlit *flit = new LISNoCFlit;
-        //LISNoCFlitControlInfo *controlInfo2 = new LISNoCFlitControlInfo;
-        //flit->setControlInfo(controlInfo2);
-
         int col = par("columns");
         int routerId = par("routerId");
-
-        //std::cout<<"Router = "<<Rout<<" ,Data array size = "<<msg->getDataArraySize()<<std::endl;
-        //    if(msg->getDataArraySize()!=0)
-        //        std::cout<<" ,Data= "<<msg->getData(msg->getDataArraySize())<<std::endl;
 
         bool Split = controlInfo->getSplit();
         bool iX = controlInfo->getIX();
@@ -78,15 +70,18 @@ void RouterBuffer::handleIncomingFlit(LISNoCFlit *msg)
                 int dstId = controlInfo->getDstId();
                 int dst2Id = controlInfo->getDst2Id();
                 int ISId = controlInfo->getDst3Id();
-                //int col = par("columns");
-                //int routerId = par("routerId");
                 bool DCNC = controlInfo->getDCNC();
 
                 int dst1PosX = dstId%col;
                 int dst2PosX = dst2Id%col;
                 int routerPosX = routerId%col;
+                int dst3PosX = ISId%col;
+                int dst1PosY = dstId/col;
+                int dst2PosY = dst2Id/col;
+                int routerPosY = routerId/col;
+                int dst3PosY = ISId/col;
 
-                if(((dst1PosX < routerPosX) & (dst2PosX < routerPosX)) | ((dst1PosX > routerPosX) & (dst2PosX > routerPosX))){
+                if(((((dst1PosX < routerPosX) && (dst2PosX < routerPosX)) || ((dst1PosX > routerPosX) && (dst2PosX > routerPosX)) || (((dst1PosX == routerPosX) && (dst2PosX == routerPosX)) && ((dst1PosY != routerPosY) && (dst2PosY != routerPosY)))) && (ISId == -1)) || ((ISId !=-1) && (((dst1PosX < routerPosX) && (dst3PosX < routerPosX)) || ((dst1PosX > routerPosX) && (dst3PosX > routerPosX)) || (((dst1PosX == routerPosX) && (dst3PosX == routerPosX)) && ((dst1PosY != routerPosY) && (dst3PosY != routerPosY)))))){
                     m_buffer.insert(msg);
                     cancelEvent(&m_timerMsg);
                     triggerSelf(1, &m_timerMsg);
@@ -117,6 +112,7 @@ void RouterBuffer::handleIncomingFlit(LISNoCFlit *msg)
                         controlInfo2->setIsHead(controlInfo->getIsHead());
                         controlInfo2->setIsTail(controlInfo->getIsTail());
                         flit->setGenerationTime(msg->getGenerationTime());
+                        controlInfo2->setHopCount(-1);
                         flit->setPacket(msg->getPacket());
 
                         m_buffer.insert(msg);
@@ -140,7 +136,9 @@ void RouterBuffer::handleIncomingFlit(LISNoCFlit *msg)
                         controlInfo2->setSplit(true);
 
                         controlInfo->setDstId(dstId);
-                        controlInfo->setDst2Id(-1);
+                        controlInfo->setDst2Id(dst2Id);
+
+
                         controlInfo->setDst3Id(-1);
 
                         controlInfo->setMXaIS(false);
@@ -148,9 +146,12 @@ void RouterBuffer::handleIncomingFlit(LISNoCFlit *msg)
                         controlInfo->setMXaDst(true);
 
                         controlInfo2->setDstId(ISId);
+
                         controlInfo2->setDst2Id(dstId);
                         controlInfo2->setDst3Id(dst2Id);
 
+                        controlInfo2->setDst4Id_ID(controlInfo->getDst4Id_ID());
+                        controlInfo->setDst4Id_ID(-1);
                         controlInfo2->setMXaIS(true);
                         controlInfo2->setIX(false);
                         controlInfo2->setMXaDst(true);
@@ -169,6 +170,7 @@ void RouterBuffer::handleIncomingFlit(LISNoCFlit *msg)
                         controlInfo2->setIsTail(controlInfo->getIsTail());
                         controlInfo2->setSrc2Id(controlInfo->getSrc2Id());
                         flit->setGenerationTime(msg->getGenerationTime());
+                        controlInfo2->setHopCount(-1);
                         flit->setPacket(msg->getPacket());
 
 
@@ -207,14 +209,16 @@ void RouterBuffer::handleIncomingFlit(LISNoCFlit *msg)
                 controlInfo->setIX(false);
                 controlInfo2->setMXaDst(true);
                 controlInfo2->setDCNC(true);
+                controlInfo2->setUC(false);
                 controlInfo2->setSrcId(controlInfo->getSrcId());
+                controlInfo2->setSrc2Id(controlInfo->getSrc2Id());
                 controlInfo2->setPacketId(controlInfo->getPacketId());
                 flit->setBitLength(32);
                 flit->setByteLength(4);
                 controlInfo2->setFlitId(controlInfo->getFlitId());
                 controlInfo2->setIsHead(controlInfo->getIsHead());
                 controlInfo2->setIsTail(controlInfo->getIsTail());
-                flit->setGenerationTime(msg->getGenerationTime());
+
                 flit->setPacket(msg->getPacket());
 
 
@@ -227,11 +231,25 @@ void RouterBuffer::handleIncomingFlit(LISNoCFlit *msg)
 
 
                 controlInfo->setDstId(controlInfo->getDst2Id());
+                msg->setSendTime(msg->getSendTime2());
+                msg->setGenerationTime(msg->getGenerationTime2());
+                controlInfo2->setHopCount(-1);
                 controlInfo2->setDstId(controlInfo->getDst3Id());
-                controlInfo->setDst2Id(-1);
+                flit->setSendTime(msg->getSendTime());
+                flit->setGenerationTime(msg->getGenerationTime());
+
+                controlInfo->setSrcId(controlInfo2->getSrc2Id());
+                controlInfo->setSrc2Id(controlInfo2->getSrcId());
+
+                int a = controlInfo->getDst3Id();
+                int b = controlInfo->getDst2Id();
+
+                controlInfo->setDst2Id(a);
                 controlInfo->setDst3Id(-1);
-                controlInfo2->setDst2Id(-1);
+                controlInfo->setDst4Id_ID(-1);
+                controlInfo2->setDst2Id(b);
                 controlInfo2->setDst3Id(-1);
+                controlInfo2->setDst4Id_ID(-1);
                 m_buffer.insert(msg);
                 m_buffer.insert(flit);
                 cancelEvent(&m_timerMsg);

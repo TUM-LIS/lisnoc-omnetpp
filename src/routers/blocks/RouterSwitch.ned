@@ -18,7 +18,7 @@ package lisnoc.routers.blocks;
 simple RouterSwitch
 {
     parameters:
-        volatile int flitsPerPacket = default(3);
+        volatile int flitsPerPacket = default(4);
         int columns;
         int routerId;
         int nPorts;

@@ -35,7 +35,8 @@ void RouterSwitch::initialize()
         m_outputArbiters[p].resize(m_nVCs);
         m_inputRequests[p].resize(m_nVCs, NULL);
         m_outputRequests[p].resize(m_nVCs, NULL);
-        m_data_to_XOR[p].resize(m_flitsperpacket);
+        m_data_to_XOR[p].flit_info.resize(m_flitsperpacket);
+
 
         for (int v = 0; v < m_nVCs; v++) {
             Arbiter *arb = new Arbiter(m_nPorts, p, v);
@@ -102,7 +103,7 @@ int RouterSwitch::Arbiter::arbitrate()
 
     if(m_transmittingWorm) {
         ASSERT(m_requests[m_arbitratedPort]);
-        ASSERT(m_requestsIsHead[m_arbitratedPort] == false);
+        //ASSERT(m_requestsIsHead[m_arbitratedPort] == false);
 
         if(m_requestsIsTail[m_arbitratedPort] == true) {
             m_transmittingWorm = false;
@@ -116,7 +117,7 @@ int RouterSwitch::Arbiter::arbitrate()
             int rrport = (p + m_arbitratedPort + 1 + m_nPorts) % m_nPorts;
             if (m_requests[rrport]) {
 
-                ASSERT(m_requestsIsHead[rrport]);
+                //ASSERT(m_requestsIsHead[rrport]);
 
                 if(m_requestsIsTail[rrport] == false) {
                     m_arbitratedPort = rrport;
@@ -157,11 +158,54 @@ void RouterSwitch::handleMessageRequest(LISNoCFlowControlRequest *request)
     int outport = controlInfo->getOutputPort();
     int outvc = controlInfo->getVC();
 
-    Arbiter *arb = m_outputArbiters[outport][outvc];
+    int Rout=par("routerId");
+    //int col=par("columns");
+    int src1 = controlInfo->getSrcId();
+    int src2 = controlInfo->getSrc2Id();
+    int dst1 = controlInfo->getDst2Id();
+    int dst2 = controlInfo->getDst3Id();
+    int dst3 = controlInfo->getDst4Id_ID();
+    bool DCNC = controlInfo->getDCNC();
+    bool MXaIS = controlInfo->getMXaIS();
+    bool sec_source_check_flag = false;
+
+    //int src1PosX = src1%col;
+    //int src1PosY = src1/col;
+
+    //int src2PosX = src2%col;
+    //int src2PosY = src2/col;
+
+    //int ISPosX = floor((src1PosX + src2PosX)/2);
+    //int ISPosY = floor((src1PosY + src2PosY)/2);
+
+    //int ISId = (col*ISPosY)+ISPosX;
+    int ISId = controlInfo->getDstId();
 
     int gateidx = request->getArrivalGate()->getIndex();
     int inport = gateidx / m_nVCs;
     int invc = gateidx % m_nVCs;
+
+
+    if ((DCNC == true) && (Rout == ISId) && (MXaIS==true) && (dst2!=-1) && (dst3!=-1) && (Rout!=dst3)) {
+        for (int i=0; i<5; i++) {
+            if(SrcDest[i][0]==src2 && SrcDest[i][1]==src1 && SrcDest[i][2]==dst2 && SrcDest[i][3]==dst1) {
+                sec_source_check_flag = true;
+                break;
+            }
+        }
+    }
+
+    if ((sec_source_check_flag == false) && (DCNC == true) && (Rout == ISId) && (MXaIS==true) && (dst2!=-1) && (dst3!=-1) && (Rout!=dst3)) {
+        // only send grant to inport without sending fwd req to outport
+        LISNoCFlowControlGrant *grant = new LISNoCFlowControlGrant;
+        grant->setControlInfo(controlInfo);
+        grant->setAck(true);
+        sendDelayed(grant, SIMTIME_ZERO, "fc_grant_out", inport*m_nVCs+invc);
+
+        return;
+    }
+
+    Arbiter *arb = m_outputArbiters[outport][outvc];
 
     arb->request(inport, invc, controlInfo->getIsHead(), controlInfo->getIsTail());
     ASSERT(!m_inputRequests[inport][invc]);
@@ -236,7 +280,8 @@ void RouterSwitch::handleMessageFlit(LISNoCFlit *msg)
     LISNoCFlitControlInfo *controlInfo = (LISNoCFlitControlInfo*) msg->getControlInfo();
     int oport = controlInfo->getOutputPort();
     int ovc = controlInfo->getVC();
-    int MXaIS = controlInfo->getMXaIS();
+    bool MXaIS = controlInfo->getMXaIS();
+    bool DCNC = controlInfo->getDCNC();
     int Rout=par("routerId");
     int col=par("columns");
     int flitid = controlInfo->getFlitId();
@@ -245,39 +290,45 @@ void RouterSwitch::handleMessageFlit(LISNoCFlit *msg)
     int src2 = controlInfo->getSrc2Id();
     int dst1 = controlInfo->getDst2Id();
     int dst2 = controlInfo->getDst3Id();
+    int dst3 = controlInfo->getDst4Id_ID();
 
-    int src1PosX = src1%col;
-    int src1PosY = src1/col;
+    int ISId = controlInfo->getDstId();
 
-    int src2PosX = src2%col;
-    int src2PosY = src2/col;
-
-    int ISPosX = floor((src1PosX + src2PosX)/2);
-    int ISPosY = floor((src1PosY + src2PosY)/2);
-
-    int ISId = (col*ISPosY)+ISPosX;
-
-    if (MXaIS == 1 && Rout == ISId)
+    if ((DCNC == true) && (MXaIS == true) && (Rout == ISId) && (dst2!=-1) && (dst3!=-1) && (Rout!=dst3))
     {
         for(int i=0; i<5; i++){
             if(SrcDest[i][0]!=-1)
+            {
                 if(SrcDest[i][0]==src2 && SrcDest[i][1]==src1 && SrcDest[i][2]==dst2 && SrcDest[i][3]==dst1)
                 {
+                    msg->setSendTime2(m_data_to_XOR[i].flit_info[flitid].send_time);
+                    msg->setGenerationTime2(m_data_to_XOR[i].flit_info[flitid].gen_time);
                     for(int k=0; k<4 ; k++){
-                        msg->setData(k,unsigned(msg->getData(k)^m_data_to_XOR[i][flitid]->getData(k)));
-                        cout << unsigned(msg->getData(k)) <<endl;
-                        controlInfo->setIX(true);
+                        msg->setData(k, unsigned(msg->getData(k)^m_data_to_XOR[i].flit_info[flitid].data_bytes[k]));
                     }
-                    if(controlInfo->getIsTail()==1){
+                    if(controlInfo->getIsTail()==true){
                         SrcDest[i][0]=-1;
                     }
+                    controlInfo->setIX(true);
+                    controlInfo->setDstId(dst3);
+
+                    int RoutPosX = Rout%col;
+                    int RoutPosY = Rout/col;
+                    int Src2PosX = src2%col;
+                    int Src2PosY = src2/col;
+
+                    int HC_Src2_IS = abs(RoutPosX - Src2PosX) + abs(RoutPosY - Src2PosY);
+                    controlInfo->setHopCount(controlInfo->getHopCount()+1+HC_Src2_IS);
+
                     send(msg, "out", oport*m_nVCs+ovc);
                     return;
+
                 }
+            }
         }
 
 
-        if(controlInfo->getIsHead())
+        if(controlInfo->getIsHead()==true)
         {
                 for (int i=0; i<5; i++){
                     if(SrcDest[i][0]==-1){
@@ -286,7 +337,11 @@ void RouterSwitch::handleMessageFlit(LISNoCFlit *msg)
                         SrcDest[i][2]=dst1;
                         SrcDest[i][3]=dst2;
 
-                        m_data_to_XOR[i][flitid]=msg;
+                        m_data_to_XOR[i].flit_info[flitid].send_time = msg->getSendTime();
+                        m_data_to_XOR[i].flit_info[flitid].gen_time = msg->getGenerationTime();
+                        for (int j=0; j<4; j++) {
+                            m_data_to_XOR[i].flit_info[flitid].data_bytes[j] = msg->getData(j);
+                        }
                         break;
                     }
                 }
@@ -294,13 +349,19 @@ void RouterSwitch::handleMessageFlit(LISNoCFlit *msg)
                             // Add to the already stored previous flits of this packet
                 for (int i=0; i<5; i++){
                     if (SrcDest[i][0]==src1 && SrcDest[i][1]==src2 && SrcDest[i][2]==dst1 && SrcDest[i][3]==dst2){
-                        m_data_to_XOR[i][flitid]=msg;
+                        //m_data_to_XOR[i][flitid]=msg;
+                        m_data_to_XOR[i].flit_info[flitid].send_time = msg->getSendTime();
+                        m_data_to_XOR[i].flit_info[flitid].gen_time = msg->getGenerationTime();
+                        for (int j=0; j<4; j++) {
+                            m_data_to_XOR[i].flit_info[flitid].data_bytes[j] = msg->getData(j);
+                        }
                         break;
                     }
                 }
         }
     }
     else{
+    controlInfo->setHopCount(controlInfo->getHopCount()+1);
     send(msg, "out", oport*m_nVCs+ovc);
     }
 }
@@ -325,12 +386,6 @@ RouterSwitch::~RouterSwitch()
             delete m_outputRequests[p][v];
         }
     }
-
-    for (int p = 0; p < m_nPorts; p++) {
-            for (int v = 0; v < m_flitsperpacket; v++) {
-                delete m_data_to_XOR[p][v];
-            }
-        }
 
     delete m_selfSignal;
 }

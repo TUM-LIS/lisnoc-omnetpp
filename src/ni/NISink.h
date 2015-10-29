@@ -25,6 +25,13 @@ namespace lisnoc {
 
 class NIStatisticsUnit;
 
+
+typedef struct {
+    std::vector<unsigned int> data_bytes;
+    int src1, src2, dst1, dst2;
+} packet_info_t;
+
+
 /**
  * Message sink; see NED file for more info.
  */
@@ -40,6 +47,9 @@ class NISink : public LISNoCBaseModule
     virtual bool isRequestGranted(LISNoCFlowControlRequest *msg);
 
     NIStatisticsUnit *m_niSU;
+
+    std::vector<packet_info_t> to_XOR_list;
+    int do_xor_idx;
 };
 
 }; // namespace

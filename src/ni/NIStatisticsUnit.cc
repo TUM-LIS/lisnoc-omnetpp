@@ -27,7 +27,7 @@ void NIStatisticsUnit::initialize()
     GlobalStatisticsUnit::s_getGlobalStatisticsUnit()->registerNIStatisticsUnit(par("id"), this);
 
     m_packetCount = 0;
-    m_faultyPacketCount = 0;
+    //mm_faultyPacketCount = 0;
 
     m_seperateStream = par("seperateStream");
 
@@ -41,11 +41,12 @@ void NIStatisticsUnit::handleMessage(cMessage *msg)
     ASSERT(msg->isSelfMessage());
     delete msg;
 
-    double conv = double(m_faultyPacketCount) / double(m_packetCount);
+    //mdouble conv = double(m_faultyPacketCount) / double(m_packetCount);
 
-    m_faultProbability.collect(conv);
+    //mm_faultProbability.collect(conv);
 
-    std::cout << simTime() << " " << getFullPath() << " CONVERGENCE: " << conv << " STDDEV: " << m_faultProbability.getStddev() << std::endl;
+    //mstd::cout << simTime() << " " << getFullPath() << " CONVERGENCE: " << conv << " STDDEV: " << m_faultProbability.getStddev() << std::endl;
+    std::cout << simTime() << " " << getFullPath() << std::endl;
 
     scheduleAt(simTime() + CONV_INTERVAL, new cMessage);
 }
@@ -56,22 +57,27 @@ void NIStatisticsUnit::collectFlitLatency(int networkAccessLatency, int networkL
     m_flitTotalLatency.collect(networkAccessLatency+networkLatency);
 }
 
-void NIStatisticsUnit::reportFlitArrivedFaulty(bool faulty) {
-    m_flitArrivedFaulty.collect(faulty);
+void NIStatisticsUnit::collectFlitHopCount(int HopCount) {
+    m_flitHopCount.collect(HopCount);
 }
 
-void NIStatisticsUnit::reportPacketArrivedFaulty(bool faulty) {
+/*mvoid NIStatisticsUnit::reportFlitArrivedFaulty(bool faulty) {
+    m_flitArrivedFaulty.collect(faulty);
+}*/
+
+/*mvoid NIStatisticsUnit::reportPacketArrivedFaulty(bool faulty) {
     m_packetCount++;
     if (faulty) m_faultyPacketCount++;
     m_packetArrivedFaulty.collect(faulty);
-}
+}*/
 
 void NIStatisticsUnit::finish() {
     m_flitNetworkLatency.recordAs("flit_network_latency");
     m_flitNetworkAccessLatency.recordAs("flit_network_access_latency");
     m_flitTotalLatency.recordAs("flit_total_latency");
-    m_flitArrivedFaulty.recordAs("flit_arrived_faulty");
-    m_packetArrivedFaulty.recordAs("packet_arrived_faulty");
+    m_flitHopCount.recordAs("flit_Hop_Count");
+    //mm_flitArrivedFaulty.recordAs("flit_arrived_faulty");
+    //mm_packetArrivedFaulty.recordAs("packet_arrived_faulty");
 }
 
 } //namespace

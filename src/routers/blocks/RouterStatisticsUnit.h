@@ -24,8 +24,8 @@ class RouterStatisticsUnit : public cSimpleModule
 {
   public:
     void collectBufferLatency(const char* type, int port, int vc, int latency);
-    void collectFault(const char* type, int port, int vc);
-    void collectBitflip(const char* type, int port, int vc);
+    //mvoid collectFault(const char* type, int port, int vc);
+    //mvoid collectBitflip(const char* type, int port, int vc);
 
   protected:
     virtual void initialize();
@@ -40,12 +40,12 @@ class RouterStatisticsUnit : public cSimpleModule
     std::vector<std::vector<cLongHistogram> > m_inBufferLat;
     std::vector<std::vector<cLongHistogram> > m_outBufferLat;
 
-    std::vector<std::vector<cLongHistogram> > m_inBufferFault;
-    std::vector<std::vector<cLongHistogram> > m_outBufferFault;
-    std::vector<std::vector<cLongHistogram> > m_linkFault;
-    std::vector<std::vector<cLongHistogram> > m_inBufferBitflip;
-    std::vector<std::vector<cLongHistogram> > m_outBufferBitflip;
-    std::vector<std::vector<cLongHistogram> > m_linkBitflip;
+    //mstd::vector<std::vector<cLongHistogram> > m_inBufferFault;
+    //mstd::vector<std::vector<cLongHistogram> > m_outBufferFault;
+    //mstd::vector<std::vector<cLongHistogram> > m_linkFault;
+    //mstd::vector<std::vector<cLongHistogram> > m_inBufferBitflip;
+    //mstd::vector<std::vector<cLongHistogram> > m_outBufferBitflip;
+    //mstd::vector<std::vector<cLongHistogram> > m_linkBitflip;
 
 };
 

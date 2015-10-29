@@ -30,26 +30,26 @@ void RouterStatisticsUnit::initialize()
     m_inBufferLat.resize(m_nPorts);
     m_outBufferLat.resize(m_nPorts);
 
-    m_inBufferFault.resize(m_nPorts);
-    m_outBufferFault.resize(m_nPorts);
-    m_linkFault.resize(m_nPorts);
+    //mm_inBufferFault.resize(m_nPorts);
+    //mm_outBufferFault.resize(m_nPorts);
+    //mm_linkFault.resize(m_nPorts);
 
-    m_inBufferBitflip.resize(m_nPorts);
-    m_outBufferBitflip.resize(m_nPorts);
-    m_linkBitflip.resize(m_nPorts);
+    //mm_inBufferBitflip.resize(m_nPorts);
+    //mm_outBufferBitflip.resize(m_nPorts);
+    //mm_linkBitflip.resize(m_nPorts);
 
 
     for(int p=0; p<m_nPorts; p++) {
         m_inBufferLat[p].resize(m_nVCs);
         m_outBufferLat[p].resize(m_nVCs);
 
-        m_inBufferFault[p].resize(m_nVCs);
-        m_outBufferFault[p].resize(m_nVCs);
-        m_linkFault[p].resize(m_nVCs);
+        //mm_inBufferFault[p].resize(m_nVCs);
+        //mm_outBufferFault[p].resize(m_nVCs);
+        //mm_linkFault[p].resize(m_nVCs);
 
-        m_inBufferBitflip[p].resize(m_nVCs);
-        m_outBufferBitflip[p].resize(m_nVCs);
-        m_linkBitflip[p].resize(m_nVCs);
+        //mm_inBufferBitflip[p].resize(m_nVCs);
+        //mm_outBufferBitflip[p].resize(m_nVCs);
+        //mm_linkBitflip[p].resize(m_nVCs);
     }
 }
 
@@ -68,7 +68,7 @@ void RouterStatisticsUnit::collectBufferLatency(const char *type, int port, int 
     }
 }
 
-void RouterStatisticsUnit::collectFault(const char* type, int port, int vc) {
+/*mvoid RouterStatisticsUnit::collectFault(const char* type, int port, int vc) {
     if (strcmp("in", type) == 0) {
         m_inBufferFault[port][vc].collect(1);
     } else if (strcmp("out", type) == 0) {
@@ -78,9 +78,9 @@ void RouterStatisticsUnit::collectFault(const char* type, int port, int vc) {
     } else {
         error("Unknown type");
     }
-}
+}*/
 
-void RouterStatisticsUnit::collectBitflip(const char* type, int port, int vc) {
+/*mvoid RouterStatisticsUnit::collectBitflip(const char* type, int port, int vc) {
     if (strcmp("in", type) == 0) {
         m_inBufferBitflip[port][vc].collect(1);
     } else if (strcmp("out", type) == 0) {
@@ -90,7 +90,7 @@ void RouterStatisticsUnit::collectBitflip(const char* type, int port, int vc) {
     } else {
         error("Unknown type");
     }
-}
+}*/
 
 
 void RouterStatisticsUnit::finish() {
@@ -103,23 +103,23 @@ void RouterStatisticsUnit::finish() {
             sprintf(recordName, "outBuffer_%i_vc_%i_latency", p, vc);
             m_outBufferLat[p][vc].recordAs(recordName);
 
-            sprintf(recordName, "inBuffer_%i_vc_%i_faults", p, vc);
-            m_inBufferFault[p][vc].recordAs(recordName);
+            //msprintf(recordName, "inBuffer_%i_vc_%i_faults", p, vc);
+            //mm_inBufferFault[p][vc].recordAs(recordName);
 
-            sprintf(recordName, "outBuffer_%i_vc_%i_faults", p, vc);
-            m_outBufferFault[p][vc].recordAs(recordName);
+            //msprintf(recordName, "outBuffer_%i_vc_%i_faults", p, vc);
+            //mm_outBufferFault[p][vc].recordAs(recordName);
 
-            sprintf(recordName, "link_%i_vc_%i_faults", p, vc);
-            m_linkFault[p][vc].recordAs(recordName);
+            //msprintf(recordName, "link_%i_vc_%i_faults", p, vc);
+            //mm_linkFault[p][vc].recordAs(recordName);
 
-            sprintf(recordName, "inBuffer_%i_vc_%i_bitflips", p, vc);
-            m_inBufferBitflip[p][vc].recordAs(recordName);
+            //msprintf(recordName, "inBuffer_%i_vc_%i_bitflips", p, vc);
+            //mm_inBufferBitflip[p][vc].recordAs(recordName);
 
-            sprintf(recordName, "outBuffer_%i_vc_%i_bitflips", p, vc);
-            m_outBufferBitflip[p][vc].recordAs(recordName);
+            //msprintf(recordName, "outBuffer_%i_vc_%i_bitflips", p, vc);
+            //mm_outBufferBitflip[p][vc].recordAs(recordName);
 
-            sprintf(recordName, "link_%i_vc_%i_bitflips", p, vc);
-            m_linkBitflip[p][vc].recordAs(recordName);
+            //msprintf(recordName, "link_%i_vc_%i_bitflips", p, vc);
+            //mm_linkBitflip[p][vc].recordAs(recordName);
         }
     }
 }

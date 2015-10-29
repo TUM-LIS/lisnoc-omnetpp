@@ -29,12 +29,15 @@ simple NISource
         volatile int dst3Id = default(-1);
         volatile int src2Id = default(-1);
         volatile bool DCNC = default(false);
+        volatile bool UC = default(false);
         volatile bool Split = default(false);
         volatile int initialdelay = default(0);
         volatile int genDelay = default(100);
         int abortAccessLatency = default(1000);
-        volatile int flitsPerPacket = default(3);
+        volatile int flitsPerPacket = default(4);
         int columns;
+        int Algo;
+        bool NC_better_check = default(false);           // Hops(ButterflyNC) < Hops(Dual Cast), then do NC else not
     @display("i=block/source");
     gates:
         output out[nVCs];

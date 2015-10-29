@@ -19,7 +19,21 @@
 #include <omnetpp.h>
 #include <LISNoCMessages.h>
 
+//#define FLITS_PER_PACKET 4          // TODO: later link with par("flitsPerPacket")
+
 namespace lisnoc {
+
+typedef struct {
+    unsigned int data_bytes[4];
+    simtime_t send_time;
+    simtime_t gen_time;
+} flit_info_t;
+
+typedef struct {
+    std::vector<flit_info_t> flit_info;
+} m_data_to_XOR_t;
+
+
 
 /**
  * TODO - Generated class
@@ -62,7 +76,8 @@ private:
     std::vector<std::vector<LISNoCFlowControlRequest*> > m_outputRequests;
 
     std::vector<std::vector<LISNoCFlitControlInfo*> > m_inputRequests;
-    std::vector<std::vector<LISNoCFlit*> > m_data_to_XOR;
+    //std::vector<std::vector<LISNoCFlit*> > m_data_to_XOR;
+    std::vector<m_data_to_XOR_t> m_data_to_XOR;
     int SrcDest [5][4];                  //for each port save 2 sources and destinations for XOR
 
   protected:
